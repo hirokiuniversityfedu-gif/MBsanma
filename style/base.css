@@ -1,0 +1,271 @@
+/* ========= base.css ========= */
+
+/* ===== 共通変数 ===== */
+:root{
+  --centerYOffset: -8px;
+
+  --tile: clamp(36px, 3.4vw, 36px);
+  --gap: clamp(1px, 0.45vw, 1px);
+  --cols: 6;
+  --rowsMax: 4;
+
+  --riverW: calc(var(--cols) * var(--tile) + (var(--cols) - 1) * var(--gap));
+  --myRiverH: calc(var(--rowsMax) * var(--tile) + (var(--rowsMax) - 1) * var(--gap));
+
+  --cpuRows: 3;
+  --cpuRiverH: calc(var(--cpuRows) * var(--tile) + (var(--cpuRows) - 1) * var(--gap));
+  --rowStep: calc(var(--tile) + var(--gap));
+
+  --cpuRowsShow: 3;
+  --cpuBoxH: calc(var(--cpuRowsShow) * var(--tile) + (var(--cpuRowsShow) - 1) * var(--gap));
+}
+
+/* ===== ベースレイアウト ===== */
+html,
+body{
+  width: 100%;
+  min-height: 100%;
+}
+
+body{
+  font-family: system-ui;
+  margin: 0;
+  background: #143625;
+  color: #111;
+  overflow-x: hidden;
+}
+
+h1{
+  font-size: 18px;
+  margin: 0;
+}
+
+h3{
+  font-size: 14px;
+  margin: 8px 0 6px;
+}
+
+button{
+  cursor: pointer;
+}
+
+.app{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  box-sizing: border-box;
+  gap: 0;
+}
+
+.topbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+  position: relative;
+  z-index: 20;
+}
+
+.muted{
+  color:#666;
+  font-size:12px;
+}
+
+/* ===== 上部バッジ ===== */
+.badgeTop{
+  display:none;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: rgba(255,255,255,0.9);
+  font-size: 12px;
+}
+
+/* ===== 左上タイトル＋説明 ===== */
+.topIntro{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: relative;
+  z-index: 20;
+}
+
+.topIntroTitle{
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: .03em;
+  color: #f2f2f2;
+}
+
+.topIntroSub{
+  font-size: 12px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.2;
+}
+
+/* ===== 盤面ステージ ===== */
+.boardStage{
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+}
+
+.gameBoard{
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  min-width: 320px;
+  min-height: 180px;
+  max-width: none;
+  max-height: 100vh;
+  background: url("../img/mat.png") center center / cover no-repeat;
+  background-color: #2a6f44;
+  container-type: inline-size;
+  overflow: visible;
+
+  --zoneW: 24%;
+  --zoneH: 48%;
+  --zoneTop: 0%;
+  --zoneLeft: calc(50% - (var(--zoneW) / 2));
+  --zoneRight: calc(50% + (var(--zoneW) / 2));
+
+  --cpuRiverYOffset: 0%;
+  --myRiverYOffset: 0%;
+}
+
+/* ===== マット内上部コントロール ===== */
+.boardTopControls{
+  position: absolute;
+  left: 50%;
+  top: 2%;
+  transform: translateX(-50%);
+  z-index: 20;
+
+  width: min(62%, 820px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 1.2cqw, 18px);
+
+  pointer-events: none;
+}
+
+.boardTopLeftControls,
+.boardTopRightControls{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(6px, 0.8cqw, 10px);
+  pointer-events: auto;
+}
+
+.boardTopLeftControls{
+  flex-wrap: wrap;
+}
+
+.boardTopControls button{
+  padding: 6px 12px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(0,0,0,0.16);
+  background: rgba(255,255,255,0.96);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.10);
+
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .02em;
+  white-space: nowrap;
+
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.boardTopControls button:hover{
+  background: rgba(255,255,255,1);
+}
+
+.boardTopControls button:active{
+  transform: translateY(1px);
+}
+
+.boardTopControls button:focus{
+  outline: none;
+}
+
+.boardTopControls button:focus-visible{
+  outline: 2px solid rgba(0,140,255,0.70);
+  outline-offset: 2px;
+}
+
+/* ===== 受け入れ切替ボタン（盤面内配置版） ===== */
+#ukeireToggleBtn{
+  position: static;
+  top: auto;
+  right: auto;
+  z-index: auto;
+}
+
+@media (max-width: 900px){
+  .app{
+    padding: 0;
+    gap: 0;
+  }
+
+  .gameBoard{
+    width: min(100vw, calc(100vh * 16 / 9));
+  }
+
+  .boardTopControls{
+    width: min(76%, 900px);
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 640px){
+  .topIntroTitle{
+    font-size: 14px;
+  }
+
+  .topIntroSub{
+    font-size: 11px;
+  }
+
+  .topbar{
+    gap: 6px;
+  }
+
+  .topbar button{
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .gameBoard{
+    width: min(100vw, calc(100vh * 16 / 9));
+  }
+
+  .boardTopControls{
+    width: min(88%, 100%);
+    top: 1.8%;
+    gap: 6px;
+  }
+
+  .boardTopLeftControls,
+  .boardTopRightControls{
+    gap: 6px;
+  }
+
+  .boardTopControls button{
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
