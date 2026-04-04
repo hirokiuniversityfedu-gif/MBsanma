@@ -143,7 +143,7 @@
 
   function getCurrentSessionLabel(){
     if (currentSession.mode === "account" && currentSession.accountId){
-      return `アカウント：${currentSession.accountId}`;
+      return currentSession.accountId;
     }
     return "ゲスト";
   }
@@ -404,6 +404,56 @@
         cursor: pointer;
       }
 
+      .visitorStatsOverlayShell .visitorPanelSub{
+        display: none;
+      }
+      .visitorStatsHeaderMeta{
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-left: auto;
+        flex-wrap: wrap;
+      }
+      .visitorStatsHeaderTabs{
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .visitorStatsHeaderTabBtn{
+        appearance: none;
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 999px;
+        min-height: 34px;
+        padding: 0 12px;
+        background: rgba(255,255,255,0.04);
+        color: rgba(245,247,244,0.78);
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .visitorStatsHeaderTabBtn.isActive{
+        background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06)), rgba(76, 119, 98, 0.78);
+        border-color: rgba(182, 227, 201, 0.24);
+        color: #ffffff;
+        box-shadow: 0 10px 18px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.12);
+      }
+      .visitorStatsAccountBadge{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 34px;
+        padding: 0 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,214,111,0.20);
+        background: rgba(255,214,111,0.08);
+        color: #fff3c5;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.02em;
+      }
+
       .visitorRuleTabs{
         display: flex;
         flex-wrap: wrap;
@@ -563,40 +613,67 @@
         gap: 10px;
       }
       .visitorStatsCard{
-        border-radius: 18px;
+        border-radius: 16px;
         border: 1px solid rgba(255,255,255,0.10);
         background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
-        padding: 16px;
-        min-height: 144px;
+        padding: 12px 12px 11px;
+        min-height: 0;
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+      }
+      .visitorStatsCard.is-rank-1{
+        background: linear-gradient(180deg, rgba(26,57,124,0.96), rgba(15,28,66,0.92));
+        border-color: rgba(123,168,255,0.26);
+      }
+      .visitorStatsCard.is-rank-2{
+        background: linear-gradient(180deg, rgba(28,79,88,0.94), rgba(15,42,48,0.92));
+        border-color: rgba(109,216,212,0.22);
+      }
+      .visitorStatsCard.is-rank-3{
+        background: linear-gradient(180deg, rgba(88,47,42,0.94), rgba(56,25,22,0.92));
+        border-color: rgba(238,132,116,0.22);
       }
       .visitorStatsCardTop{
         display: flex;
         align-items: baseline;
         justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 12px;
+        gap: 8px;
+        margin-bottom: 8px;
       }
       .visitorStatsCardRound{
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 800;
-        color: rgba(245,247,244,0.68);
+        color: rgba(245,247,244,0.70);
       }
       .visitorStatsCardRank{
-        font-size: 26px;
+        font-size: 22px;
         font-weight: 900;
         line-height: 1;
       }
-      .visitorStatsCardPoint{
-        font-size: 24px;
-        font-weight: 900;
-        line-height: 1.05;
-        margin-bottom: 8px;
+      .visitorStatsCardLabel{
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.03em;
+        color: rgba(245,247,244,0.72);
+        margin-bottom: 4px;
       }
-      .visitorStatsCardSub{
-        font-size: 13px;
-        color: rgba(245,247,244,0.82);
-        line-height: 1.55;
+      .visitorStatsCardScore{
+        font-size: 28px;
+        font-weight: 900;
+        line-height: 1.0;
+        color: #ffffff;
+        margin-bottom: 6px;
+      }
+      .visitorStatsCardPoint{
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.15;
+        color: rgba(245,247,244,0.90);
+        margin-bottom: 4px;
+      }
+      .visitorStatsCardMeta{
+        font-size: 11px;
+        color: rgba(245,247,244,0.76);
+        line-height: 1.35;
       }
       .visitorStatsMain{
         display: grid;
@@ -815,14 +892,14 @@
         gap: 10px;
       }
       .visitorStatsTableCell{
-        border-radius: 14px;
+        border-radius: 13px;
         background: rgba(0,0,0,0.16);
         border: 1px solid rgba(255,255,255,0.08);
-        padding: 12px 10px;
-        min-height: 82px;
+        padding: 10px 9px;
+        min-height: 68px;
         display: grid;
         align-content: start;
-        gap: 8px;
+        gap: 5px;
       }
       .visitorStatsTableLabel{
         font-size: 12px;
@@ -830,14 +907,14 @@
         color: rgba(245,247,244,0.72);
       }
       .visitorStatsTableValue{
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 900;
-        line-height: 1.1;
+        line-height: 1.05;
         color: #ffd56f;
       }
       .visitorStatsTableHint{
-        font-size: 11px;
-        line-height: 1.5;
+        font-size: 10px;
+        line-height: 1.3;
         color: rgba(245,247,244,0.48);
       }
       .visitorStatsEmpty{
@@ -968,6 +1045,27 @@
           padding-bottom: 4px;
           background: linear-gradient(180deg, rgba(20,32,26,0.96) 0%, rgba(20,32,26,0.92) 72%, rgba(20,32,26,0) 100%);
         }
+        .visitorStatsOverlayShell .visitorPanelHeader{
+          gap: 8px;
+          align-items: center;
+        }
+        .visitorStatsHeaderMeta{
+          flex: 1 1 auto;
+          gap: 6px;
+        }
+        .visitorStatsHeaderTabs{
+          gap: 5px;
+        }
+        .visitorStatsHeaderTabBtn{
+          min-height: 30px;
+          padding: 0 10px;
+          font-size: 11px;
+        }
+        .visitorStatsAccountBadge{
+          min-height: 30px;
+          padding: 0 10px;
+          font-size: 11px;
+        }
         .visitorRuleTabBtn,
         .visitorStatsTabBtn{
           min-height: 40px;
@@ -1053,32 +1151,34 @@
         }
         .visitorStatsCards{
           display: grid;
-          grid-auto-flow: column;
-          grid-auto-columns: minmax(76%, 1fr);
-          grid-template-columns: none;
-          overflow-x: auto;
-          gap: 10px;
-          padding-bottom: 4px;
-          scroll-snap-type: x proximity;
-          -webkit-overflow-scrolling: touch;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 8px;
         }
         .visitorStatsCard{
-          min-height: 124px;
-          padding: 14px;
-          scroll-snap-align: start;
+          min-height: 0;
+          padding: 10px 9px 9px;
         }
         .visitorStatsCardRound{
-          font-size: 11px;
+          font-size: 9px;
         }
         .visitorStatsCardRank{
-          font-size: 24px;
+          font-size: 17px;
+        }
+        .visitorStatsCardLabel{
+          font-size: 9px;
+          margin-bottom: 3px;
+        }
+        .visitorStatsCardScore{
+          font-size: 20px;
+          margin-bottom: 4px;
         }
         .visitorStatsCardPoint{
-          font-size: 22px;
-          margin-bottom: 6px;
+          font-size: 11px;
+          margin-bottom: 3px;
         }
-        .visitorStatsCardSub{
-          font-size: 12px;
+        .visitorStatsCardMeta{
+          font-size: 9px;
+          line-height: 1.3;
         }
         .visitorStatsMain{
           grid-template-columns: 1fr;
@@ -1133,22 +1233,22 @@
           height: 20px;
         }
         .visitorStatsTableGrid{
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 8px;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 7px;
         }
         .visitorStatsTableCell{
-          min-height: 78px;
-          padding: 10px 9px;
-          border-radius: 12px;
+          min-height: 62px;
+          padding: 8px 8px;
+          border-radius: 11px;
         }
         .visitorStatsTableLabel{
-          font-size: 11px;
+          font-size: 10px;
         }
         .visitorStatsTableValue{
-          font-size: 18px;
+          font-size: 15px;
         }
         .visitorStatsTableHint{
-          font-size: 10px;
+          font-size: 9px;
         }
         .visitorStatsEmpty{
           padding: 16px 14px;
@@ -1204,13 +1304,18 @@
           min-height: 108px;
           padding: 10px;
         }
-        .visitorStatsCardRank,
-        .visitorStatsCardPoint{
+        .visitorStatsCardRank{
+          font-size: 16px;
+        }
+        .visitorStatsCardScore{
           font-size: 18px;
         }
-        .visitorStatsCardSub,
-        .visitorStatsCardRound{
+        .visitorStatsCardPoint{
           font-size: 11px;
+        }
+        .visitorStatsCardMeta,
+        .visitorStatsCardRound{
+          font-size: 10px;
         }
         .visitorStatsSummary{
           padding: 12px;
@@ -1627,6 +1732,30 @@
       ""
     );
     overlay = shell.overlay;
+    overlay.classList.add("visitorStatsOverlayShell");
+    shell.panel.classList.add("visitorStatsPanelShell");
+
+    const header = shell.panel.querySelector(".visitorPanelHeader");
+    const closeBtn = shell.panel.querySelector(".visitorPanelClose");
+
+    const meta = document.createElement("div");
+    meta.className = "visitorStatsHeaderMeta";
+
+    const tabs = document.createElement("div");
+    tabs.className = "visitorStatsHeaderTabs";
+    tabs.id = "visitorStatsHeaderTabs";
+
+    const account = document.createElement("div");
+    account.className = "visitorStatsAccountBadge";
+    account.id = "visitorStatsAccountBadge";
+    account.textContent = getCurrentSessionLabel();
+
+    meta.appendChild(tabs);
+    meta.appendChild(account);
+
+    if (header && closeBtn){
+      header.insertBefore(meta, closeBtn);
+    }
 
     const root = document.createElement("div");
     root.className = "visitorStatsSection";
@@ -1638,8 +1767,9 @@
   function updateStatsOverlayHeader(){
     const overlay = ensureStatsOverlay();
     const subEl = overlay ? overlay.querySelector(".visitorPanelSub") : null;
-    if (!subEl) return;
-    subEl.textContent = getCurrentSessionDescription();
+    const accountEl = document.getElementById("visitorStatsAccountBadge");
+    if (subEl) subEl.textContent = "";
+    if (accountEl) accountEl.textContent = getCurrentSessionLabel();
   }
 
   function buildStatsSessionBar(){
@@ -2052,8 +2182,9 @@
     cards.className = "visitorStatsCards";
 
     history.slice(0, 3).forEach((item, index)=>{
+      const rankIndex = Number(item.rankIndex);
       const card = document.createElement("div");
-      card.className = "visitorStatsCard";
+      card.className = `visitorStatsCard is-rank-${rankIndex + 1}`;
 
       const top = document.createElement("div");
       top.className = "visitorStatsCardTop";
@@ -2066,26 +2197,34 @@
       rank.className = "visitorStatsCardRank";
       rank.textContent = item.rankLabel || "—";
 
+      const scoreLabel = document.createElement("div");
+      scoreLabel.className = "visitorStatsCardLabel";
+      scoreLabel.textContent = "最終スコア";
+
+      const score = document.createElement("div");
+      score.className = "visitorStatsCardScore";
+      score.textContent = Number.isFinite(item.totalScoreValue)
+        ? `${item.totalScoreValue > 0 ? "+" : ""}${item.totalScoreValue.toFixed(1)}`
+        : "—";
+
       const point = document.createElement("div");
       point.className = "visitorStatsCardPoint";
       point.textContent = formatPointText(item.point);
 
-      const sub = document.createElement("div");
-      sub.className = "visitorStatsCardSub";
-      const reason = item.reason ? `${item.reason}` : "半荘終了";
-      const totalScoreValueText = Number.isFinite(item.totalScoreValue)
-        ? `${item.totalScoreValue > 0 ? "+" : ""}${item.totalScoreValue.toFixed(1)}`
-        : "—";
+      const meta = document.createElement("div");
+      meta.className = "visitorStatsCardMeta";
       const scoreValueText = Number.isFinite(item.scoreValue)
         ? `${item.scoreValue > 0 ? "+" : ""}${item.scoreValue.toFixed(1)}`
         : "—";
-      sub.innerHTML = `${reason}<br>最終スコア ${totalScoreValueText} / ${formatSignedChipText(item.chipCount)} / 素点 ${scoreValueText}`;
+      meta.textContent = `${formatSignedChipText(item.chipCount)} / 素点 ${scoreValueText}`;
 
       top.appendChild(round);
       top.appendChild(rank);
       card.appendChild(top);
+      card.appendChild(scoreLabel);
+      card.appendChild(score);
       card.appendChild(point);
-      card.appendChild(sub);
+      card.appendChild(meta);
       cards.appendChild(card);
     });
 
@@ -2125,6 +2264,8 @@
       hojuRateValue: totalKyoku > 0 ? (totalHoju / totalKyoku) : 0,
       furoRateValue: totalKyoku > 0 ? (totalFuroKyoku / totalKyoku) : 0,
       avgRank: history.length > 0 ? history.reduce((sum, item)=> sum + ((Number(item.rankIndex) || 0) + 1), 0) / history.length : 0,
+      totalScoreValue: history.reduce((sum, item)=> sum + (Number(item.totalScoreValue) || 0), 0),
+      totalChipCount: history.reduce((sum, item)=> sum + (Number(item.chipCount) || 0), 0),
       avgPoint: averageFromHistory(history, "point"),
       avgScoreValue: averageFromHistory(history, "scoreValue"),
       avgTotalScoreValue: averageFromHistory(history, "totalScoreValue"),
@@ -2337,26 +2478,25 @@
   function renderStatsOverlay(){
     ensureStatsOverlay();
     const root = document.getElementById("visitorStatsRoot");
+    const headerTabs = document.getElementById("visitorStatsHeaderTabs");
+    const accountBadge = document.getElementById("visitorStatsAccountBadge");
     if (!root) return;
     root.innerHTML = "";
+    if (headerTabs) headerTabs.innerHTML = "";
+    if (accountBadge) accountBadge.textContent = getCurrentSessionLabel();
 
-    const context = getStatsHistoryContext();
-    const history = context.history;
-    const usingSample = context.usingSample;
-    const hasRealData = context.hasRealData;
+    const history = readHistory();
 
     updateStatsOverlayHeader();
-    root.appendChild(buildStatsSessionBar());
-    root.appendChild(buildStatsPreviewBar(usingSample, hasRealData));
 
     if (!history.length){
       const empty = document.createElement("div");
       empty.className = "visitorStatsEmpty";
       empty.innerHTML = currentSession.mode === "account"
         ? (isCloudSyncReady()
-            ? "まだ成績がありません。<br>半荘を終えると、このアカウントにクラウド保存されます。<br><br>レイアウト確認だけしたいときは上の「サンプル表示」を押してください。"
-            : "まだ成績がありません。<br>半荘を終えると、このアカウントに保存されます。<br><br>レイアウト確認だけしたいときは上の「サンプル表示」を押してください。")
-        : "まだ成績がありません。<br>ゲストはこのタブ内だけ一時保存されます。<br><br>レイアウト確認だけしたいときは上の「サンプル表示」を押してください。";
+            ? "まだ成績がありません。<br>半荘を終えると、このアカウントにクラウド保存されます。"
+            : "まだ成績がありません。<br>半荘を終えると、このアカウントに保存されます。")
+        : "まだ成績がありません。<br>ゲストはこの端末内だけ一時保存されます。";
       root.appendChild(empty);
       return;
     }
@@ -2364,9 +2504,6 @@
     const metrics = buildStatsMetrics(history);
     const styleScores = buildStyleScores(history, metrics);
     const donut = buildDonutStyle(metrics);
-
-    const tabs = document.createElement("div");
-    tabs.className = "visitorRuleTabs visitorStatsTabs";
 
     const panels = document.createElement("div");
     panels.className = "visitorStatsPanels";
@@ -2396,13 +2533,13 @@
     tabDefs.forEach((tab)=>{
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "visitorRuleTabBtn visitorStatsTabBtn";
+      btn.className = "visitorStatsHeaderTabBtn";
       btn.textContent = tab.label;
       btn.dataset.statsTabKey = tab.key;
       btn.setAttribute("aria-selected", "false");
       btn.addEventListener("click", ()=> setActiveTab(tab.key));
       tabButtons.push(btn);
-      tabs.appendChild(btn);
+      if (headerTabs) headerTabs.appendChild(btn);
     });
 
     const overviewPanel = document.createElement("section");
@@ -2410,12 +2547,14 @@
     overviewPanel.dataset.statsPanelKey = "overview";
     overviewPanel.appendChild(buildStatsCards(history.slice(0, 3)));
     overviewPanel.appendChild(buildStatsMetricPanel("サマリー", [
+      { label: "対戦数", value: `${history.length}`, hint: "保存中の半荘数" },
       { label: "一位率", value: formatRate(metrics.rankCounts[0], history.length), hint: "半荘順位" },
       { label: "平均順位", value: formatAverageRank(metrics.avgRank), hint: "半荘の平均" },
+      { label: "総合スコア", value: formatSignedScoreValue(metrics.totalScoreValue), hint: "チップ込み合計" },
+      { label: "総合チップ", value: formatSignedChipText(metrics.totalChipCount), hint: "保存中の合計" },
       { label: "平均最終スコア", value: formatSignedScoreValue(metrics.avgTotalScoreValue), hint: "チップ込み" },
       { label: "平均終了点", value: formatAvgPoint(metrics.avgPoint), hint: "最終持ち点" },
-      { label: "平均チップ", value: `${metrics.avgChip > 0 ? "+" : ""}${metrics.avgChip.toFixed(1)}枚`, hint: "半荘ごとの平均" },
-      { label: "対戦数", value: `${history.length}`, hint: "保存中の半荘数" }
+      { label: "平均チップ", value: `${metrics.avgChip > 0 ? "+" : ""}${metrics.avgChip.toFixed(1)}枚`, hint: "半荘ごとの平均" }
     ]));
 
     const graphsPanel = document.createElement("section");
@@ -2447,7 +2586,6 @@
     panels.appendChild(graphsPanel);
     panels.appendChild(detailPanel);
 
-    root.appendChild(tabs);
     root.appendChild(panels);
     setActiveTab(activeKey);
   }
