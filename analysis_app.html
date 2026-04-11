@@ -826,10 +826,10 @@
         [
           createMetricCard("対象半荘", formatCount(summary.scope.includedMatchCount), "条件に合う半荘"),
           createMetricCard("対象局", formatCount(summary.overall.kyokuCount), "局ベース"),
-          createMetricCard("集計件数", formatCount(summary.overall.sampleKyokuCount), "全体傾向の集計数"),
-          createMetricCard("モード内訳", formatModeCount(summary), "検証 / 対局 / 未分類"),
-          createMetricCard("親件数", formatCount(summary.overall.dealerSampleCount), "集計対象内"),
-          createMetricCard("子件数", formatCount(summary.overall.nondealerSampleCount), "集計対象内")
+          createMetricCard("対象和了件数", formatCount(summary.agari.count), "和了全体"),
+          createMetricCard("対象リーチ件数", formatCount(summary.riichi.count), "リーチ全体"),
+          createMetricCard("対象放銃件数", formatCount(summary.hoju.count), "放銃全体"),
+          createMetricCard("対象ツモ和了件数", formatCount(summary.agari.tsumoCount), "ツモ和了のみ")
         ].forEach((card)=> grid.appendChild(card));
         section.appendChild(grid);
         return section;
@@ -962,6 +962,10 @@
               createMetricCard("流局率", formatRate(summary.ryukyoku.rate), "全局基準"),
               createMetricCard("横移動率", formatRate(summary.horizontal.rate), "自分が無関係で終わる率"),
               createMetricCard("平均打点", formatAvgPoint(summary.overall.averagePoint), "ツモ・ロンを含む和了全体"),
+              createMetricCard("和了時平均チップ枚数", formatAvgCount(summary.overall.averageAgariChipCount, "枚"), "和了した手のみ"),
+              createMetricCard("1着時平均スコア", formatAvgScore(summary.overall.averageRank1Score), "チップ込み"),
+              createMetricCard("2着時平均スコア", formatAvgScore(summary.overall.averageRank2Score), "チップ込み"),
+              createMetricCard("3着時平均スコア", formatAvgScore(summary.overall.averageRank3Score), "チップ込み"),
               createMetricCard("被ツモ時平均失点", formatAvgPoint(summary.overall.averageHitByTsumoPoint), "被ツモした手の平均打点"),
               createMetricCard("放銃時平均失点", formatAvgPoint(summary.overall.averageHojuPoint), "放銃した手の平均打点"),
               createMetricCard("平均ドラ枚数", formatAvgCount(summary.overall.averageDoraCount, "枚"), "和了詳細ありの分のみ")
