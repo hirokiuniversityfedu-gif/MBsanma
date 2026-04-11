@@ -286,9 +286,14 @@
 
   function getPointFromAgariEntry(entry){
     if (!entry || typeof entry !== "object") return null;
+
+    const scoreInfoPoint = scoreInfoToPoint(entry.scoreInfo, entry.winType);
+    if (Number.isFinite(scoreInfoPoint) && scoreInfoPoint > 0) return scoreInfoPoint;
+
     const directPoint = Number(entry.pointValue);
     if (Number.isFinite(directPoint) && directPoint > 0) return directPoint;
-    return scoreInfoToPoint(entry.scoreInfo, entry.winType);
+
+    return null;
   }
 
   function getSeatAgariPoint(settlement, seatIndex){
