@@ -343,31 +343,36 @@ function cloneSettlementDetailValue(value){
   }
 }
 
-function scoreInfoToSettlementPoint(scoreInfo){
+function scoreInfoToSettlementPoint(scoreInfo, winType){
   if (!scoreInfo || typeof scoreInfo !== "object") return null;
 
-  const candidates = [
-    scoreInfo.totalPoint,
-    scoreInfo.point,
-    scoreInfo.basicPoint,
-    scoreInfo.ronPoint,
-    scoreInfo.displayPoint,
-    scoreInfo.finalPoint,
-    scoreInfo.basePoint
-  ];
+  const normalizedWinType = String(winType || "").toLowerCase();
 
-  for (const value of candidates){
-    const n = Number(value);
-    if (Number.isFinite(n) && n > 0) return n;
+  if (normalizedWinType === "ron"){
+    const ronPoint = Number(scoreInfo.ronPoint);
+    if (Number.isFinite(ronPoint) && ronPoint > 0) return ronPoint;
   }
 
-  const payAll = Number(scoreInfo.payAll);
-  if (Number.isFinite(payAll) && payAll > 0) return payAll * 2;
+  if (normalizedWinType === "tsumo" || normalizedWinType === "nagashi"){
+    const payAll = Number(scoreInfo.payAll);
+    if (Number.isFinite(payAll) && payAll > 0){
+      return payAll * 2;
+    }
 
-  const payKo = Number(scoreInfo.payChild);
-  const payOya = Number(scoreInfo.payDealer);
-  if (Number.isFinite(payKo) || Number.isFinite(payOya)){
-    return (Number.isFinite(payKo) ? payKo * 2 : 0) + (Number.isFinite(payOya) ? payOya : 0);
+    const payChild = Number(scoreInfo.payChild);
+    const payDealer = Number(scoreInfo.payDealer);
+    if (Number.isFinite(payChild) || Number.isFinite(payDealer)){
+      return (Number.isFinite(payChild) ? payChild : 0) + (Number.isFinite(payDealer) ? payDealer : 0);
+    }
+  }
+
+  const point = Number(scoreInfo.point);
+  if (Number.isFinite(point) && point > 0) return point;
+
+  const tsumoPointKo = Number(scoreInfo.tsumoPointKo);
+  const tsumoPointOya = Number(scoreInfo.tsumoPointOya);
+  if (Number.isFinite(tsumoPointKo) || Number.isFinite(tsumoPointOya)){
+    return (Number.isFinite(tsumoPointKo) ? tsumoPointKo * 2 : 0) + (Number.isFinite(tsumoPointOya) ? tsumoPointOya : 0);
   }
 
   return null;
@@ -405,7 +410,7 @@ function buildSettlementAgariDetailPayload(entryLike, info, scoreInfo){
 
   return {
     pointText: scoreInfo && typeof scoreInfo.displayText === "string" ? scoreInfo.displayText : "",
-    pointValue: scoreInfoToSettlementPoint(scoreInfo),
+    pointValue: scoreInfoToSettlementPoint(scoreInfo, entry.winType),
     han: Number.isFinite(Number(info && info.han)) ? Number(info.han) : null,
     fu: Number.isFinite(Number(info && info.fu)) ? Number(info.fu) : null,
     totalHan: Number.isFinite(Number(info && info.totalHan)) ? Number(info.totalHan) : null,
