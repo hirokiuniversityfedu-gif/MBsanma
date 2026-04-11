@@ -586,10 +586,176 @@
     return null;
   }
 
+  function cloneScoreTriplet(src){
+    if (!Array.isArray(src)) return [0, 0, 0];
+    return [
+      Number.isFinite(Number(src[0])) ? (Number(src[0]) | 0) : 0,
+      Number.isFinite(Number(src[1])) ? (Number(src[1]) | 0) : 0,
+      Number.isFinite(Number(src[2])) ? (Number(src[2]) | 0) : 0
+    ];
+  }
+
+  function getPreviousSeatIndexForMetrics(seatIndex){
+    if (seatIndex !== 0 && seatIndex !== 1 && seatIndex !== 2) return null;
+    return (seatIndex + 2) % 3;
+  }
+
+  function getTobiBustSeatIndexesForMetrics(scoreList){
+    const list = [];
+    const scores = Array.isArray(scoreList) ? scoreList : [];
+    for (let seat = 0; seat < 3; seat++){
+      const value = Number(scores[seat]) || 0;
+      if (value <= 0) list.push(seat);
+    }
+    return list;
+  }
+
+  function getRonTobiRecipientSeatFromSettlementForMetrics(settlement, bustSeat){
+    if (!settlement) return null;
+
+    if (Array.isArray(settlement.agariEntries) && settlement.agariEntries.length > 0){
+      const winnerSeats = settlement.agariEntries
+        .map((entry)=> entry && entry.winnerSeatIndex)
+        .filter((seat)=> seat === 0 || seat === 1 || seat === 2);
+
+      if (winnerSeats.length <= 0) return null;
+      if (winnerSeats.length === 1) return winnerSeats[0];
+
+      const kamichaSeat = getPreviousSeatIndexForMetrics(bustSeat);
+      if (kamichaSeat === 0 || kamichaSeat === 1 || kamichaSeat === 2){
+        if (winnerSeats.includes(kamichaSeat)) return kamichaSeat;
+      }
+
+      const headSeat = settlement.headEntry && (settlement.headEntry.winnerSeatIndex === 0 || settlement.headEntry.winnerSeatIndex === 1 || settlement.headEntry.winnerSeatIndex === 2)
+        ? settlement.headEntry.winnerSeatIndex
+        : null;
+      if (headSeat != null && winnerSeats.includes(headSeat)) return headSeat;
+
+      return winnerSeats[0];
+    }
+
+    if (settlement.winnerSeatIndex === 0 || settlement.winnerSeatIndex === 1 || settlement.winnerSeatIndex === 2){
+      return settlement.winnerSeatIndex;
+    }
+
+    return null;
+  }
+
+  function getRyukyokuTobiRecipientSeatFromSettlementForMetrics(settlement, bustSeat){
+    if (!settlement || !Array.isArray(settlement.tenpaiSeats)) return null;
+
+    const tenpaiSeats = settlement.tenpaiSeats.filter((seat)=> seat === 0 || seat === 1 || seat === 2);
+    if (tenpaiSeats.length <= 0) return null;
+    if (tenpaiSeats.length === 1) return tenpaiSeats[0];
+
+    const kamichaSeat = getPreviousSeatIndexForMetrics(bustSeat);
+    if (kamichaSeat === 0 || kamichaSeat === 1 || kamichaSeat === 2){
+      if (tenpaiSeats.includes(kamichaSeat)) return kamichaSeat;
+    }
+
+    return tenpaiSeats[0];
+  }
+
+  function getTobiChipRecipientSeatFromSettlementForMetrics(settlement, bustSeat){
+    if (!settlement) return null;
+    if (bustSeat !== 0 && bustSeat !== 1 && bustSeat !== 2) return null;
+
+    if (settlement.type === "agari"){
+      if (settlement.winType === "tsumo"){
+        return (settlement.winnerSeatIndex === 0 || settlement.winnerSeatIndex === 1 || settlement.winnerSeatIndex === 2)
+          ? settlement.winnerSeatIndex
+          : null;
+      }
+
+      if (settlement.winType === "ron"){
+        return getRonTobiRecipientSeatFromSettlementForMetrics(settlement, bustSeat);
+      }
+    }
+
+    if (settlement.type === "ryukyoku"){
+      return getRyukyokuTobiRecipientSeatFromSettlementForMetrics(settlement, bustSeat);
+    }
+
+    return null;
+  }
+
+  function getHighestScoreSeatForMetrics(scoreList, bustSeat){
+    if (!Array.isArray(scoreList)) return null;
+
+    let bestSeat = null;
+    let bestScore = -Infinity;
+
+    for (let seat = 0; seat < 3; seat++){
+      if (seat === bustSeat) continue;
+      const value = Number(scoreList[seat]) || 0;
+      if (value > bestScore){
+        bestScore = value;
+        bestSeat = seat;
+      }
+    }
+
+    return bestSeat;
+  }
+
+  function getNoBustAdjustedScoresForMetrics(scoreList, settlement){
+    const adjusted = cloneScoreTriplet(scoreList);
+    const bustSeats = getTobiBustSeatIndexesForMetrics(adjusted);
+    if (bustSeats.length <= 0) return adjusted;
+
+    for (const bustSeat of bustSeats){
+      const rawScore = Number(adjusted[bustSeat]) || 0;
+      if (rawScore >= 0) continue;
+
+      const deficit = -rawScore;
+      adjusted[bustSeat] = 0;
+
+      let recipientSeat = getTobiChipRecipientSeatFromSettlementForMetrics(settlement, bustSeat);
+      if (recipientSeat !== 0 && recipientSeat !== 1 && recipientSeat !== 2){
+        recipientSeat = getHighestScoreSeatForMetrics(adjusted, bustSeat);
+      }
+
+      if (recipientSeat !== 0 && recipientSeat !== 1 && recipientSeat !== 2) continue;
+      if (recipientSeat === bustSeat) continue;
+
+      adjusted[recipientSeat] = (Number(adjusted[recipientSeat]) || 0) - deficit;
+    }
+
+    return adjusted;
+  }
+
+  function getHanchanUmaByRankForMetrics(rows){
+    const secondScore = rows && rows[1] ? (Number(rows[1].score) || 0) : 0;
+    if (secondScore >= 40000){
+      return [25, 5, -15];
+    }
+    return [30, -5, -10];
+  }
+
+  function calcHanchanFinalScoreValueForMetrics(point, rankIndex, rows){
+    const rawPoint = Number(point) || 0;
+    const scorePoint = Math.max(0, rawPoint);
+    const base = (scorePoint - 40000) / 1000;
+    const umaByRank = getHanchanUmaByRankForMetrics(rows);
+    return base + (Number(umaByRank[rankIndex]) || 0);
+  }
+
+  function calcHanchanTotalScoreValueForMetrics(point, rankIndex, rows, chipCount){
+    const baseScore = calcHanchanFinalScoreValueForMetrics(point, rankIndex, rows);
+    const chipScore = (Number(chipCount) || 0) * 2;
+    return baseScore + chipScore;
+  }
+
   function computeFallbackFinalPoints(log){
+    const summary = log && log.summary && typeof log.summary === "object" ? log.summary : {};
+    const endInfo = summary.endInfo && typeof summary.endInfo === "object" ? summary.endInfo : {};
+    const endPointArray = extractFinalPointArray(endInfo);
+    if (endPointArray && endPointArray.length >= 3){
+      return endPointArray.slice(0, 3).map((value)=> safeNumber(value, 0));
+    }
+
     const settlement = getLastSettlement(log);
     if (settlement && safeArray(settlement.afterScores).length >= 3){
-      return safeArray(settlement.afterScores).slice(0, 3).map((value)=> safeNumber(value, 0));
+      return getNoBustAdjustedScoresForMetrics(safeArray(settlement.afterScores).slice(0, 3), settlement);
     }
     return null;
   }
@@ -663,6 +829,25 @@
     return null;
   }
 
+  function extractFinalPointArray(endInfo){
+    const src = endInfo && typeof endInfo === "object" ? endInfo : null;
+    if (!src) return null;
+    const candidates = [
+      "finalPoints",
+      "points",
+      "pointTotals",
+      "resultPoints",
+      "finalPointList",
+      "pointList"
+    ];
+    for (const key of candidates){
+      const value = getObjectByPath(src, key);
+      const arr = extractSeatArrayFromUnknown(value);
+      if (arr && arr.length >= 3) return arr;
+    }
+    return null;
+  }
+
   function extractChipArray(endInfo){
     const src = endInfo && typeof endInfo === "object" ? endInfo : null;
     if (!src) return null;
@@ -689,13 +874,69 @@
     return scoreValue + (Number.isFinite(chipValue) ? chipValue * 2 : 0);
   }
 
+  function buildMatchChipArray(log, endInfo){
+    const chipArray = extractChipArray(endInfo);
+    if (chipArray && chipArray.length >= 3){
+      return chipArray.slice(0, 3).map((value)=> safeNumber(value, 0));
+    }
+
+    const totals = [0, 0, 0];
+    safeArray(log && log.kyokus).forEach((kyoku)=> {
+      const settlement = getSettlement(kyoku);
+      if (!settlement) return;
+      for (let seat = 0; seat < 3; seat++){
+        const chipDelta = getSeatChipDelta(settlement, seat);
+        if (Number.isFinite(chipDelta)) totals[seat] += chipDelta;
+      }
+    });
+    return totals;
+  }
+
+  function buildFinalRankedRowsFromLog(log, endInfo){
+    const finalPoints = computeFallbackFinalPoints(log);
+    if (!finalPoints || finalPoints.length < 3) return null;
+
+    const chipTotals = buildMatchChipArray(log, endInfo);
+    const rows = [];
+    for (let seat = 0; seat < 3; seat++){
+      rows.push({
+        seat,
+        score: safeNumber(finalPoints[seat], 0),
+        chipCount: safeNumber(chipTotals[seat], 0)
+      });
+    }
+
+    rows.sort((a, b)=> {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.seat - b.seat;
+    });
+
+    for (let i = 0; i < rows.length; i++){
+      rows[i].rankIndex = i;
+      rows[i].rank = i + 1;
+      rows[i].finalScoreValue = calcHanchanFinalScoreValueForMetrics(rows[i].score, i, rows);
+      rows[i].totalScoreValue = calcHanchanTotalScoreValueForMetrics(rows[i].score, i, rows, rows[i].chipCount);
+    }
+
+    return {
+      rows,
+      finalPoints: rows.map((row)=> row.score)
+    };
+  }
+
   function getMatchSummaryInfo(log, seatIndex){
     const summary = log && log.summary && typeof log.summary === "object" ? log.summary : {};
     const endInfo = summary.endInfo && typeof summary.endInfo === "object" ? summary.endInfo : {};
     const rankArray = extractRankArray(endInfo);
     const scoreArray = extractScoreArray(endInfo);
     const chipArray = extractChipArray(endInfo);
-    const finalPoints = computeFallbackFinalPoints(log);
+    const finalRowsInfo = buildFinalRankedRowsFromLog(log, endInfo);
+    const finalRow = finalRowsInfo && Array.isArray(finalRowsInfo.rows)
+      ? finalRowsInfo.rows.find((row)=> row && row.seat === seatIndex) || null
+      : null;
+    const finalPoints = finalRowsInfo && Array.isArray(finalRowsInfo.finalPoints)
+      ? finalRowsInfo.finalPoints.slice(0, 3)
+      : computeFallbackFinalPoints(log);
 
     const matchChipDeltas = [];
     safeArray(log && log.kyokus).forEach((kyoku)=> {
@@ -705,11 +946,11 @@
       if (Number.isFinite(chipDelta)) matchChipDeltas.push(chipDelta);
     });
 
-    const rank = rankArray && Number.isFinite(Number(rankArray[seatIndex]))
+    const extractedRank = rankArray && Number.isFinite(Number(rankArray[seatIndex]))
       ? Number(rankArray[seatIndex])
       : computeFallbackRankFromPoints(finalPoints, seatIndex);
 
-    const score = scoreArray && Number.isFinite(Number(scoreArray[seatIndex]))
+    const extractedScore = scoreArray && Number.isFinite(Number(scoreArray[seatIndex]))
       ? Number(scoreArray[seatIndex])
       : findNumberByCandidateKeys(endInfo, [
           `score.${seatIndex}`,
@@ -718,17 +959,34 @@
           `player${seatIndex}.score`
         ]);
 
-    const chips = chipArray && Number.isFinite(Number(chipArray[seatIndex]))
-      ? Number(chipArray[seatIndex])
-      : sumFrom(matchChipDeltas);
+    const chips = finalRow && Number.isFinite(Number(finalRow.chipCount))
+      ? Number(finalRow.chipCount)
+      : (chipArray && Number.isFinite(Number(chipArray[seatIndex]))
+          ? Number(chipArray[seatIndex])
+          : sumFrom(matchChipDeltas));
 
-    const finalPoint = finalPoints && Number.isFinite(Number(finalPoints[seatIndex]))
-      ? Number(finalPoints[seatIndex])
-      : null;
+    const finalPoint = finalRow && Number.isFinite(Number(finalRow.score))
+      ? Number(finalRow.score)
+      : (finalPoints && Number.isFinite(Number(finalPoints[seatIndex]))
+          ? Number(finalPoints[seatIndex])
+          : null);
+
+    const finalScoreValue = finalRow && Number.isFinite(Number(finalRow.finalScoreValue))
+      ? Number(finalRow.finalScoreValue)
+      : (Number.isFinite(extractedScore) ? Number(extractedScore) : null);
+
+    const totalScoreValue = finalRow && Number.isFinite(Number(finalRow.totalScoreValue))
+      ? Number(finalRow.totalScoreValue)
+      : computeChipIncludedScore(finalScoreValue, chips);
+
+    const rank = finalRow && Number.isFinite(Number(finalRow.rank))
+      ? Number(finalRow.rank)
+      : extractedRank;
 
     return {
       rank: Number.isFinite(rank) ? rank : null,
-      score: Number.isFinite(score) ? score : null,
+      score: Number.isFinite(finalScoreValue) ? finalScoreValue : null,
+      totalScore: Number.isFinite(totalScoreValue) ? totalScoreValue : null,
       chips: Number.isFinite(chips) ? chips : null,
       finalPoint: Number.isFinite(finalPoint) ? finalPoint : null,
       finalPoints
@@ -1059,7 +1317,9 @@
 
       [0, 1, 2].forEach((seatIndex)=> {
         const matchInfo = getMatchSummaryInfo(log, seatIndex);
-        const chipIncludedScore = computeChipIncludedScore(matchInfo.score, matchInfo.chips);
+        const chipIncludedScore = Number.isFinite(Number(matchInfo.totalScore))
+          ? Number(matchInfo.totalScore)
+          : computeChipIncludedScore(matchInfo.score, matchInfo.chips);
         if (!Number.isFinite(chipIncludedScore)) return;
         if (matchInfo.rank === 1) rank1ScoreList.push(chipIncludedScore);
         else if (matchInfo.rank === 2) rank2ScoreList.push(chipIncludedScore);
