@@ -254,36 +254,31 @@
 
     const normalizedWinType = String(winType || "").toLowerCase();
 
-    const pureCandidates = [];
     if (normalizedWinType === "ron"){
-      pureCandidates.push(scoreInfo.point, scoreInfo.ronPoint);
-    } else if (normalizedWinType === "tsumo"){
-      pureCandidates.push(scoreInfo.point);
-    } else {
-      pureCandidates.push(scoreInfo.point, scoreInfo.ronPoint);
+      const ronPoint = Number(scoreInfo.ronPoint);
+      if (Number.isFinite(ronPoint) && ronPoint > 0) return ronPoint;
     }
 
-    for (const value of pureCandidates){
-      const n = Number(value);
-      if (Number.isFinite(n) && n > 0) return n;
+    if (normalizedWinType === "tsumo" || normalizedWinType === "nagashi"){
+      const payAll = Number(scoreInfo.payAll);
+      if (Number.isFinite(payAll) && payAll > 0){
+        return payAll * 2;
+      }
+
+      const payChild = Number(scoreInfo.payChild);
+      const payDealer = Number(scoreInfo.payDealer);
+      if (Number.isFinite(payChild) || Number.isFinite(payDealer)){
+        return (Number.isFinite(payChild) ? payChild : 0) + (Number.isFinite(payDealer) ? payDealer : 0);
+      }
     }
 
-    const ko = Number(scoreInfo.tsumoPointKo);
-    const oya = Number(scoreInfo.tsumoPointOya);
-    if (Number.isFinite(ko) || Number.isFinite(oya)){
-      return (Number.isFinite(ko) ? ko * 2 : 0) + (Number.isFinite(oya) ? oya : 0);
-    }
+    const point = Number(scoreInfo.point);
+    if (Number.isFinite(point) && point > 0) return point;
 
-    const fallbackCandidates = [
-      scoreInfo.totalPoint,
-      scoreInfo.displayPoint,
-      scoreInfo.finalPoint,
-      scoreInfo.basicPoint,
-      scoreInfo.basePoint
-    ];
-    for (const value of fallbackCandidates){
-      const n = Number(value);
-      if (Number.isFinite(n) && n > 0) return n;
+    const tsumoPointKo = Number(scoreInfo.tsumoPointKo);
+    const tsumoPointOya = Number(scoreInfo.tsumoPointOya);
+    if (Number.isFinite(tsumoPointKo) || Number.isFinite(tsumoPointOya)){
+      return (Number.isFinite(tsumoPointKo) ? tsumoPointKo * 2 : 0) + (Number.isFinite(tsumoPointOya) ? tsumoPointOya : 0);
     }
 
     return null;
