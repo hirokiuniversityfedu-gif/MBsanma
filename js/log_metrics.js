@@ -665,6 +665,13 @@
     return null;
   }
 
+  function computeChipIncludedScore(score, chips){
+    const baseScore = Number(score);
+    if (!Number.isFinite(baseScore)) return null;
+    const chipValue = Number(chips);
+    return baseScore + (Number.isFinite(chipValue) ? chipValue * 2 : 0);
+  }
+
   function getMatchSummaryInfo(log, seatIndex){
     const summary = log && log.summary && typeof log.summary === "object" ? log.summary : {};
     const endInfo = summary.endInfo && typeof summary.endInfo === "object" ? summary.endInfo : {};
@@ -883,6 +890,10 @@
         nondealerSampleCount: 0,
         horizontalRate: null,
         averagePoint: null,
+        averageAgariChipCount: null,
+        averageRank1Score: null,
+        averageRank2Score: null,
+        averageRank3Score: null,
         averageHojuPoint: null,
         averageHitByTsumoPoint: null,
         averageDoraCount: null
@@ -988,6 +999,7 @@
     const riichiWaitTileCounts = [];
     const openCountInOpenSamples = [];
     const agariPointList = [];
+    const agariChipCountList = [];
     const agariPointRiichiList = [];
     const agariPointOpenList = [];
     const agariPointDamaList = [];
@@ -996,6 +1008,9 @@
     const agariDoraCounts = [];
     const hojuPointList = [];
     const hitByTsumoPointList = [];
+    const rank1ScoreList = [];
+    const rank2ScoreList = [];
+    const rank3ScoreList = [];
 
     const agariYakuCompositeCounts = {
       tanyao: 0,
@@ -1024,6 +1039,15 @@
       summary.matchCounts.included += 1;
       summary.matchCounts[matchMode] = (summary.matchCounts[matchMode] || 0) + 1;
       summary.matchCounts[sessionMode] = (summary.matchCounts[sessionMode] || 0) + 1;
+
+      [0, 1, 2].forEach((seatIndex)=> {
+        const matchInfo = getMatchSummaryInfo(log, seatIndex);
+        const chipIncludedScore = computeChipIncludedScore(matchInfo.score, matchInfo.chips);
+        if (!Number.isFinite(chipIncludedScore)) return;
+        if (matchInfo.rank === 1) rank1ScoreList.push(chipIncludedScore);
+        else if (matchInfo.rank === 2) rank2ScoreList.push(chipIncludedScore);
+        else if (matchInfo.rank === 3) rank3ScoreList.push(chipIncludedScore);
+      });
 
       safeArray(log && log.kyokus).forEach((kyoku)=> {
         const includedSeats = getIncludedSeats(kyoku, normalizedFilters.dealer);
@@ -1087,6 +1111,11 @@
                 if (winType === "tsumo") agariPointTsumoList.push(point);
                 if (winType === "ron") agariPointRonList.push(point);
                 if (point >= 8000) summary.agari.manganOrMoreCount += 1;
+              }
+
+              const agariChipDelta = getSeatChipDelta(settlement, seatIndex);
+              if (Number.isFinite(agariChipDelta)){
+                agariChipCountList.push(Math.abs(agariChipDelta));
               }
 
               const detailSource = entry || settlement;
@@ -1207,6 +1236,10 @@
 
     summary.overall.horizontalRate = summary.horizontal.rate;
     summary.overall.averagePoint = summary.agari.averagePoint;
+    summary.overall.averageAgariChipCount = averageFrom(agariChipCountList);
+    summary.overall.averageRank1Score = averageFrom(rank1ScoreList);
+    summary.overall.averageRank2Score = averageFrom(rank2ScoreList);
+    summary.overall.averageRank3Score = averageFrom(rank3ScoreList);
     summary.overall.averageHojuPoint = summary.hoju.averagePoint;
     summary.overall.averageHitByTsumoPoint = summary.hitByTsumo.averagePoint;
     summary.overall.averageDoraCount = summary.agari.averageDoraCount;
