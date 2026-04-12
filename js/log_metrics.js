@@ -189,6 +189,36 @@
     };
   }
 
+  function hasRiichiDeclaredBySeat(kyoku, settlement, seatIndex){
+    const riichiSeats = safeArray(settlement && settlement.riichiSeats).filter((seat)=> seat === 0 || seat === 1 || seat === 2);
+    if (riichiSeats.includes(seatIndex)) return true;
+    return !!findRiichiEventBySeat(kyoku, seatIndex);
+  }
+
+  function hasOpenBySeat(kyoku, seatIndex){
+    return getOpenEventCountBySeat(kyoku, seatIndex) > 0;
+  }
+
+  function isHojuToRiichiWinner(kyoku, settlement, hojuEntries){
+    return safeArray(hojuEntries).some((entry)=> {
+      const winnerSeatIndex = Number(entry && entry.winnerSeatIndex);
+      if (winnerSeatIndex === 0 || winnerSeatIndex === 1 || winnerSeatIndex === 2){
+        return hasRiichiDeclaredBySeat(kyoku, settlement, winnerSeatIndex);
+      }
+      return isRiichiAgariDetail(entry);
+    });
+  }
+
+  function isHojuToOpenWinner(kyoku, hojuEntries){
+    return safeArray(hojuEntries).some((entry)=> {
+      const winnerSeatIndex = Number(entry && entry.winnerSeatIndex);
+      if (winnerSeatIndex === 0 || winnerSeatIndex === 1 || winnerSeatIndex === 2){
+        return hasOpenBySeat(kyoku, winnerSeatIndex);
+      }
+      return isOpenAgariDetail(entry);
+    });
+  }
+
   function getAgariEntries(settlement){
     if (!settlement || settlement.type !== "agari") return [];
 
@@ -226,7 +256,10 @@
   function getHojuEntriesForSeat(settlement, seatIndex){
     if (!settlement || settlement.type !== "agari") return [];
     if (settlement.winType !== "ron" && !safeArray(settlement.agariEntries).length) return [];
-    return getAgariEntries(settlement).filter((entry)=> Number(entry && entry.discarderSeatIndex) === seatIndex);
+    return getAgariEntries(settlement).filter((entry)=> {
+      const entryWinType = String(entry && entry.winType || settlement.winType || "");
+      return entryWinType === "ron" && Number(entry && entry.discarderSeatIndex) === seatIndex;
+    });
   }
 
   function isSeatHojuSettlement(settlement, seatIndex){
@@ -1430,8 +1463,8 @@
 
               const hojuEntries = getHojuEntriesForSeat(settlement, seatIndex);
               if (hojuEntries.some((entry)=> Number(entry && entry.winnerSeatIndex) === eastSeatIndex)) summary.hoju.dealerWinnerCount += 1;
-              if (hojuEntries.some((entry)=> isRiichiAgariDetail(entry))) summary.hoju.riichiCount += 1;
-              if (hojuEntries.some((entry)=> isOpenAgariDetail(entry))) summary.hoju.openCount += 1;
+              if (isHojuToRiichiWinner(kyoku, settlement, hojuEntries)) summary.hoju.riichiCount += 1;
+              if (isHojuToOpenWinner(kyoku, hojuEntries)) summary.hoju.openCount += 1;
 
               const hojuPoint = getSeatHojuPoint(settlement, seatIndex);
               if (Number.isFinite(hojuPoint) && hojuPoint > 0){
