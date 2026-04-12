@@ -976,10 +976,21 @@
     return kyoku;
   }
 
+  function prepareSettlementForStorage(settlement){
+    try{
+      if (typeof global.mbSanmaPrepareSettlementForLog === "function"){
+        const prepared = global.mbSanmaPrepareSettlementForLog(settlement);
+        if (prepared && typeof prepared === "object") return prepared;
+      }
+    }catch(e){}
+    return settlement;
+  }
+
   function recordSettlement(settlement){
     const kyoku = getCurrentKyoku();
     if (!kyoku) return null;
-    const cloned = cloneSettlement(settlement);
+    const preparedSettlement = prepareSettlementForStorage(settlement);
+    const cloned = cloneSettlement(preparedSettlement);
     kyoku.settlement = cloned;
     pushEvent("settlement", { settlement: cloned });
     finishKyoku({
@@ -994,10 +1005,11 @@
 
   function finishMatch(endInfo, settlement){
     const log = ensureCurrentLog();
+    const preparedSettlement = prepareSettlementForStorage(settlement);
     log.endedAt = safeNowIso();
     log.summary = {
       endInfo: endInfo && typeof endInfo === "object" ? { ...endInfo } : null,
-      settlement: cloneSettlement(settlement)
+      settlement: cloneSettlement(preparedSettlement)
     };
     log.updatedAt = safeNowIso();
     const scopeKey = getScopeKeyBySession(log.session);
