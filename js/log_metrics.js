@@ -1191,17 +1191,35 @@
   }
 
   function getYakuhaiCandidatesForCode(code){
-    if (code === "1z") return ["yakuhai_ton", "東", "役牌 東", "役牌(東)"];
-    if (code === "2z") return ["yakuhai_nan", "南", "役牌 南", "役牌(南)"];
-    if (code === "3z") return ["yakuhai_sha", "西", "役牌 西", "役牌(西)"];
-    if (code === "5z") return ["yakuhai_haku", "白", "役牌 白", "役牌(白)"];
-    if (code === "6z") return ["yakuhai_hatsu", "發", "発", "役牌 發", "役牌 発", "役牌(發)", "役牌(発)"];
-    if (code === "7z") return ["yakuhai_chun", "中", "役牌 中", "役牌(中)"];
+    if (code === "1z") return ["yakuhaiton", "yakuhai_ton", "東", "役牌 東", "役牌(東)"];
+    if (code === "2z") return ["yakuhainan", "yakuhai_nan", "南", "役牌 南", "役牌(南)"];
+    if (code === "3z") return ["yakuhaisha", "yakuhai_sha", "西", "役牌 西", "役牌(西)"];
+    if (code === "5z") return ["yakuhaihaku", "yakuhai_haku", "白", "役牌 白", "役牌(白)"];
+    if (code === "6z") return ["yakuhaihatsu", "yakuhai_hatsu", "發", "発", "役牌 發", "役牌 発", "役牌(發)", "役牌(発)"];
+    if (code === "7z") return ["yakuhaichun", "yakuhai_chun", "中", "役牌 中", "役牌(中)"];
     return [];
   }
 
   function hasYakuhaiYakuForCode(yakuKeys, code){
     return hasAnyYakuKey(yakuKeys, getYakuhaiCandidatesForCode(code));
+  }
+
+  function hasRoundWindYakuhai(yakuKeys, roundWindCode){
+    return hasAnyYakuKey(yakuKeys, ["yakuhairound", "yakuhai_round", "場風", "場風（東）", "場風（南）", "場風（西）"])
+      || hasYakuhaiYakuForCode(yakuKeys, roundWindCode);
+  }
+
+  function hasSeatWindYakuhai(yakuKeys, seatWindCode){
+    return hasAnyYakuKey(yakuKeys, ["yakuhaiseat", "yakuhai_seat", "自風", "自風（東）", "自風（南）", "自風（西）"])
+      || hasYakuhaiYakuForCode(yakuKeys, seatWindCode);
+  }
+
+  function hasMenzenTsumoYaku(yakuKeys){
+    return hasAnyYakuKey(yakuKeys, ["menzentsumo", "menzen_tsumo", "門前ツモ", "門前清自摸和", "面前清自摸和"]);
+  }
+
+  function hasDoubleRiichiYaku(yakuKeys){
+    return hasAnyYakuKey(yakuKeys, ["doubleriichi", "double_riichi", "double-riichi", "ダブル立直", "ダブリー"]);
   }
 
   function isMenzenAgariDetail(detail){
@@ -1213,7 +1231,7 @@
 
   function isRiichiAgariDetail(detail){
     const yakuKeys = listYakuKeys(detail);
-    return hasAnyYakuKey(yakuKeys, ["riichi", "reach", "立直", "double_riichi", "daburii", "ダブル立直"]);
+    return hasAnyYakuKey(yakuKeys, ["riichi", "reach", "立直", "doubleriichi", "double_riichi", "daburii", "ダブル立直", "ダブリー"]);
   }
 
   function isOpenAgariDetail(detail){
@@ -1322,6 +1340,8 @@
         manganOrMoreRate: null,
         averageDoraCount: null,
         yakuCompositeRates: {
+          menzenTsumo: null,
+          doubleRiichi: null,
           tanyao: null,
           pinfu: null,
           chiitoi: null,
@@ -1397,6 +1417,8 @@
     const rank3ScoreList = [];
 
     const agariYakuCompositeCounts = {
+      menzenTsumo: 0,
+      doubleRiichi: 0,
       tanyao: 0,
       pinfu: 0,
       chiitoi: 0,
@@ -1517,13 +1539,15 @@
               const hasYakuData = yakuKeys.length > 0 || isYakumanAgariDetail(detailSource);
               if (hasYakuData){
                 summary.availability.yakuDataCount += 1;
+                if (hasMenzenTsumoYaku(yakuKeys)) agariYakuCompositeCounts.menzenTsumo += 1;
+                if (hasDoubleRiichiYaku(yakuKeys)) agariYakuCompositeCounts.doubleRiichi += 1;
                 if (hasAnyYakuKey(yakuKeys, ["tanyao", "断么九"])) agariYakuCompositeCounts.tanyao += 1;
                 if (hasAnyYakuKey(yakuKeys, ["pinfu", "平和"])) agariYakuCompositeCounts.pinfu += 1;
                 if (hasAnyYakuKey(yakuKeys, ["chiitoitsu", "chiitoi", "七対子"])) agariYakuCompositeCounts.chiitoi += 1;
                 if (hasAnyYakuKey(yakuKeys, ["toitoi", "対々和"])) agariYakuCompositeCounts.toitoi += 1;
                 if (hasAnyYakuKey(yakuKeys, ["honitsu", "chinitsu", "混一色", "清一色"])) agariYakuCompositeCounts.honitsuOrChinitsu += 1;
-                if (roundWindCode && hasYakuhaiYakuForCode(yakuKeys, roundWindCode)) agariYakuCompositeCounts.roundWind += 1;
-                if (seatWindCode && hasYakuhaiYakuForCode(yakuKeys, seatWindCode)) agariYakuCompositeCounts.seatWind += 1;
+                if (roundWindCode && hasRoundWindYakuhai(yakuKeys, roundWindCode)) agariYakuCompositeCounts.roundWind += 1;
+                if (seatWindCode && hasSeatWindYakuhai(yakuKeys, seatWindCode)) agariYakuCompositeCounts.seatWind += 1;
                 if (
                   hasYakuhaiYakuForCode(yakuKeys, "5z")
                   || hasYakuhaiYakuForCode(yakuKeys, "6z")
