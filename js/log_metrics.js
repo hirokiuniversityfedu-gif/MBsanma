@@ -187,6 +187,9 @@
   function isRyanmenLikeWaitTypeKey(key){
     const value = String(key || "").trim().toLowerCase();
     if (!value) return false;
+    if (value === "ryanmen") return true;
+    if (value === "sanmenchan") return true;
+    if (value === "multi_ryanmen") return true;
     if (value.includes("ryanmen")) return true;
     if (value.includes("two_sided")) return true;
     if (value.includes("two-sided")) return true;
@@ -195,6 +198,7 @@
     if (value.includes("three_sided")) return true;
     if (value.includes("three-sided")) return true;
     if (value.includes("三面")) return true;
+    if (value.includes("multi")) return true;
     if (value.includes("多面")) return true;
     if (value.includes("nobetan")) return true;
     return false;
@@ -211,14 +215,19 @@
     const payload = event && event.payload && typeof event.payload === "object" ? event.payload : {};
     const tenpai = payload.tenpai && typeof payload.tenpai === "object" ? payload.tenpai : {};
     const waitTypeKeys = normalizeWaitTypeKeys(tenpai.waitTypeKeys);
+    const waitCodes = safeArray(tenpai.waitCodes);
+    let waitTypeCount = safeNumber(tenpai.waitTypeCount, 0);
+    if (waitTypeCount <= 0 && waitCodes.length > 0) waitTypeCount = waitCodes.length;
+    if (waitTypeCount <= 0 && waitTypeKeys.length > 0) waitTypeCount = waitTypeKeys.length;
+    const hasKnownWaitShape = waitTypeKeys.length > 0 || typeof tenpai.isRyanmenWait === "boolean";
     return {
       hasRiichi: !!event,
       junme: safeNumber(payload.junme, 0),
       waitTileCount: safeNumber(tenpai.waitTileCount, 0),
-      waitTypeCount: waitTypeKeys.length,
+      waitTypeCount,
       waitTypeKeys,
       isRyanmenWait: hasRyanmenOrBetterWait(tenpai, waitTypeKeys),
-      hasKnownWaitShape: waitTypeKeys.length > 0
+      hasKnownWaitShape
     };
   }
 
