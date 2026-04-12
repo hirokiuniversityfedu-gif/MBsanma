@@ -1245,6 +1245,31 @@
     return !isRiichiAgariDetail(detail);
   }
 
+  function isDamaAgariByContext(detail, riichiInfo, hasOpen){
+    if (isDamaAgariDetail(detail)) return true;
+
+    const menzen = isMenzenAgariDetail(detail);
+    if (menzen === false) return false;
+    if (hasOpen) return false;
+    return !(riichiInfo && riichiInfo.hasRiichi);
+  }
+
+  function isFinalTenpaiSeatForAnalysis(settlement, seatIndex){
+    if (!settlement || typeof settlement !== "object") return false;
+
+    const tenpaiSeats = safeArray(settlement.tenpaiSeats);
+    if (tenpaiSeats.includes(seatIndex)) return true;
+
+    if (settlement.type === "agari" && isSeatAgariSettlement(settlement, seatIndex)) return true;
+    return false;
+  }
+
+  function isFinalDamaTenpaiSeatForAnalysis(settlement, seatIndex, riichiInfo, hasOpen){
+    if (hasOpen) return false;
+    if (riichiInfo && riichiInfo.hasRiichi) return false;
+    return isFinalTenpaiSeatForAnalysis(settlement, seatIndex);
+  }
+
   function countDoraFromDetail(detail){
     const bonus = detail && detail.bonus && typeof detail.bonus === "object" ? detail.bonus : null;
     if (!bonus) return null;
@@ -1433,7 +1458,7 @@
       yakuman: 0
     };
 
-    let damaSampleCount = 0;
+    let finalDamaTenpaiCount = 0;
 
     limitedLogs.forEach((log)=> {
       const matchMode = getMatchMode(log);
@@ -1478,12 +1503,13 @@
           const riichiInfo = getRiichiInfoBySeat(kyoku, seatIndex);
           const openCount = getOpenEventCountBySeat(kyoku, seatIndex);
           const hasOpen = openCount > 0;
-          const isDamaSample = !riichiInfo.hasRiichi && !hasOpen;
 
           summary.overall.sampleKyokuCount += 1;
           if (isDealer) summary.overall.dealerSampleCount += 1;
           else summary.overall.nondealerSampleCount += 1;
-          if (isDamaSample) damaSampleCount += 1;
+          if (isFinalDamaTenpaiSeatForAnalysis(settlement, seatIndex, riichiInfo, hasOpen)){
+            finalDamaTenpaiCount += 1;
+          }
 
           if (riichiInfo.hasRiichi){
             summary.riichi.count += 1;
@@ -1513,7 +1539,10 @@
               if (isDealer) summary.agari.dealerCount += 1;
               if (riichiInfo.hasRiichi) summary.agari.riichiCount += 1;
               if (hasOpen) summary.agari.openCount += 1;
-              if (isDamaSample) summary.agari.damaCount += 1;
+
+              const detailSource = entry || settlement;
+              const isDamaAgari = isDamaAgariByContext(detailSource, riichiInfo, hasOpen);
+              if (isDamaAgari) summary.agari.damaCount += 1;
 
               const point = getSeatAgariPoint(settlement, seatIndex);
               if (Number.isFinite(point) && point > 0){
@@ -1521,7 +1550,7 @@
                 summary.availability.pointDataCount += 1;
                 if (riichiInfo.hasRiichi) agariPointRiichiList.push(point);
                 if (hasOpen) agariPointOpenList.push(point);
-                if (isDamaSample) agariPointDamaList.push(point);
+                if (isDamaAgari) agariPointDamaList.push(point);
                 if (winType === "tsumo") agariPointTsumoList.push(point);
                 if (winType === "ron") agariPointRonList.push(point);
                 if (point >= 8000) summary.agari.manganOrMoreCount += 1;
@@ -1532,7 +1561,6 @@
                 agariChipCountList.push(Math.abs(agariChipDelta));
               }
 
-              const detailSource = entry || settlement;
               const yakuKeys = listYakuKeys(detailSource);
               const seatWindCode = getSeatWindCodeForAnalysis(kyoku, seatIndex);
               const roundWindCode = getRoundWindCodeForAnalysis(kyoku);
@@ -1621,7 +1649,7 @@
     summary.agari.damaRate = rate(summary.agari.damaCount, summary.agari.count);
     summary.agari.riichiAgariRate = rate(summary.agari.riichiCount, summary.riichi.count);
     summary.agari.openAgariRate = rate(summary.agari.openCount, summary.open.count);
-    summary.agari.damaAgariRate = rate(summary.agari.damaCount, damaSampleCount);
+    summary.agari.damaAgariRate = rate(summary.agari.damaCount, finalDamaTenpaiCount);
     summary.agari.averagePoint = averageFrom(agariPointList);
     summary.agari.averagePointRiichi = averageFrom(agariPointRiichiList);
     summary.agari.averagePointOpen = averageFrom(agariPointOpenList);
