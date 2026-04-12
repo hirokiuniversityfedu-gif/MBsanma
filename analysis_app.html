@@ -629,7 +629,7 @@
         agari: "和了",
         loss: "放銃 / 被ツモ",
         flow: "流局 / 進行",
-        yaku: "役 / 打点"
+        yaku: "役"
       };
 
       const filterEls = {
@@ -1029,10 +1029,12 @@
           ),
           createTabPanel(
             "yaku",
-            "役 / 打点",
+            "役",
             "よく出る役や打点の傾向を見るタブです。和了した手にどんな役がどれくらい混ざっているかを確認できます。",
             [
               createMetricCard("平均ドラ枚数", formatAvgCount(summary.agari.averageDoraCount, "枚"), "和了詳細ありの分のみ"),
+              createMetricCard("和了時面前清自摸和複合率", formatRate(summary.agari.yakuCompositeRates.menzenTsumo), "役データが残っている和了のみ"),
+              createMetricCard("和了時ダブル立直複合率", formatRate(summary.agari.yakuCompositeRates.doubleRiichi), "役データが残っている和了のみ"),
               createMetricCard("和了時タンヤオ複合率", formatRate(summary.agari.yakuCompositeRates.tanyao), "役データが残っている和了のみ"),
               createMetricCard("和了時ピンフ率", formatRate(summary.agari.yakuCompositeRates.pinfu), "役データが残っている和了のみ"),
               createMetricCard("和了時七対子複合率", formatRate(summary.agari.yakuCompositeRates.chiitoi), "役データが残っている和了のみ"),
