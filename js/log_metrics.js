@@ -176,16 +176,49 @@
     return count;
   }
 
+  function normalizeWaitTypeKeys(waitTypeKeys){
+    return Array.from(new Set(
+      safeArray(waitTypeKeys)
+        .map((value)=> String(value || "").trim().toLowerCase())
+        .filter(Boolean)
+    ));
+  }
+
+  function isRyanmenLikeWaitTypeKey(key){
+    const value = String(key || "").trim().toLowerCase();
+    if (!value) return false;
+    if (value.includes("ryanmen")) return true;
+    if (value.includes("two_sided")) return true;
+    if (value.includes("two-sided")) return true;
+    if (value.includes("両面")) return true;
+    if (value.includes("sanmen")) return true;
+    if (value.includes("three_sided")) return true;
+    if (value.includes("three-sided")) return true;
+    if (value.includes("三面")) return true;
+    if (value.includes("多面")) return true;
+    if (value.includes("nobetan")) return true;
+    return false;
+  }
+
+  function hasRyanmenOrBetterWait(tenpai, waitTypeKeys){
+    const src = tenpai && typeof tenpai === "object" ? tenpai : {};
+    if (src.isRyanmenWait === true) return true;
+    return normalizeWaitTypeKeys(waitTypeKeys).some(isRyanmenLikeWaitTypeKey);
+  }
+
   function getRiichiInfoBySeat(kyoku, seatIndex){
     const event = findRiichiEventBySeat(kyoku, seatIndex);
     const payload = event && event.payload && typeof event.payload === "object" ? event.payload : {};
     const tenpai = payload.tenpai && typeof payload.tenpai === "object" ? payload.tenpai : {};
+    const waitTypeKeys = normalizeWaitTypeKeys(tenpai.waitTypeKeys);
     return {
       hasRiichi: !!event,
       junme: safeNumber(payload.junme, 0),
       waitTileCount: safeNumber(tenpai.waitTileCount, 0),
-      isRyanmenWait: !!tenpai.isRyanmenWait,
-      hasKnownWaitShape: safeArray(tenpai.waitTypeKeys).length > 0
+      waitTypeCount: waitTypeKeys.length,
+      waitTypeKeys,
+      isRyanmenWait: hasRyanmenOrBetterWait(tenpai, waitTypeKeys),
+      hasKnownWaitShape: waitTypeKeys.length > 0
     };
   }
 
@@ -1030,6 +1063,34 @@
     return getKyokuEvents(kyoku).filter((event)=> event && event.type === "riichi");
   }
 
+  function getKyokuReachedJunme(kyoku){
+    const drawCounts = [0, 0, 0];
+
+    getKyokuEvents(kyoku).forEach((event)=> {
+      if (!event || event.type !== "draw") return;
+      const payload = event.payload && typeof event.payload === "object" ? event.payload : {};
+      const seatIndex = Number(payload.seatIndex);
+      if (seatIndex === 0 || seatIndex === 1 || seatIndex === 2){
+        drawCounts[seatIndex] += 1;
+      }
+    });
+
+    const maxDrawCount = Math.max(drawCounts[0], drawCounts[1], drawCounts[2]);
+    if (maxDrawCount > 0) return maxDrawCount;
+
+    const discardCounts = [0, 0, 0];
+    getKyokuEvents(kyoku).forEach((event)=> {
+      if (!event || event.type !== "discard") return;
+      const payload = event.payload && typeof event.payload === "object" ? event.payload : {};
+      const seatIndex = Number(payload.seatIndex);
+      if (seatIndex === 0 || seatIndex === 1 || seatIndex === 2){
+        discardCounts[seatIndex] += 1;
+      }
+    });
+
+    return Math.max(discardCounts[0], discardCounts[1], discardCounts[2], 0);
+  }
+
   function getFirstRiichiCategoryForSeat(kyoku, seatIndex){
     const myRiichiEvent = findRiichiEventBySeat(kyoku, seatIndex);
     if (!myRiichiEvent) return "";
@@ -1196,6 +1257,8 @@
         sampleKyokuCount: 0,
         dealerSampleCount: 0,
         nondealerSampleCount: 0,
+        averageKyokuCountPerMatch: null,
+        averageJunmePerKyoku: null,
         horizontalRate: null,
         averagePoint: null,
         averageAgariChipCount: null,
@@ -1210,7 +1273,9 @@
         count: 0,
         rate: null,
         averageJunme: null,
+        averageWaitTypeCount: null,
         averageWaitTileCount: null,
+        waitShapeKnownCount: 0,
         ryanmenCount: 0,
         ryanmenRate: null,
         averageCountPerMatch: null
@@ -1304,7 +1369,9 @@
     };
 
     const riichiJunmes = [];
+    const riichiWaitTypeCounts = [];
     const riichiWaitTileCounts = [];
+    const kyokuReachedJunmes = [];
     const openCountInOpenSamples = [];
     const agariPointList = [];
     const agariPointRiichiList = [];
@@ -1366,6 +1433,8 @@
         const settlement = getSettlement(kyoku);
         const eastSeatIndex = getEastSeatIndex(kyoku);
         summary.overall.kyokuCount += 1;
+        const reachedJunme = getKyokuReachedJunme(kyoku);
+        if (reachedJunme > 0) kyokuReachedJunmes.push(reachedJunme);
 
         const hasNagashi = !!(settlement && settlement.type === "agari" && (
           String(settlement.winType || "") === "nagashi"
@@ -1388,8 +1457,12 @@
           if (riichiInfo.hasRiichi){
             summary.riichi.count += 1;
             if (riichiInfo.junme > 0) riichiJunmes.push(riichiInfo.junme);
+            if (riichiInfo.waitTypeCount > 0){
+              riichiWaitTypeCounts.push(riichiInfo.waitTypeCount);
+              summary.riichi.waitShapeKnownCount += 1;
+            }
             if (riichiInfo.waitTileCount > 0) riichiWaitTileCounts.push(riichiInfo.waitTileCount);
-            if (riichiInfo.isRyanmenWait) summary.riichi.ryanmenCount += 1;
+            if (riichiInfo.hasKnownWaitShape && riichiInfo.isRyanmenWait) summary.riichi.ryanmenCount += 1;
           }
 
           if (hasOpen){
@@ -1498,8 +1571,9 @@
     const sampleKyokuCount = summary.overall.sampleKyokuCount;
     summary.riichi.rate = rate(summary.riichi.count, sampleKyokuCount);
     summary.riichi.averageJunme = averageFrom(riichiJunmes);
+    summary.riichi.averageWaitTypeCount = averageFrom(riichiWaitTypeCounts);
     summary.riichi.averageWaitTileCount = averageFrom(riichiWaitTileCounts);
-    summary.riichi.ryanmenRate = rate(summary.riichi.ryanmenCount, summary.riichi.count);
+    summary.riichi.ryanmenRate = rate(summary.riichi.ryanmenCount, summary.riichi.waitShapeKnownCount);
     summary.riichi.averageCountPerMatch = summary.scope.includedMatchCount > 0 ? (summary.riichi.count / summary.scope.includedMatchCount) : null;
 
     summary.open.rate = rate(summary.open.count, sampleKyokuCount);
@@ -1544,6 +1618,8 @@
 
     summary.nagashi.rate = rate(summary.nagashi.count, summary.overall.kyokuCount);
 
+    summary.overall.averageKyokuCountPerMatch = summary.scope.includedMatchCount > 0 ? (summary.overall.kyokuCount / summary.scope.includedMatchCount) : null;
+    summary.overall.averageJunmePerKyoku = averageFrom(kyokuReachedJunmes);
     summary.overall.horizontalRate = summary.horizontal.rate;
     summary.overall.averagePoint = summary.agari.averagePoint;
     summary.overall.averageAgariChipCount = averageFrom(agariChipCountList);
