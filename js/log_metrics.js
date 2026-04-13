@@ -1649,7 +1649,7 @@
                 ) agariYakuCompositeCounts.dragons += 1;
                 if (hasAnyYakuKey(yakuKeys, ["iipeikou", "iipeiko", "一盃口"])) agariYakuCompositeCounts.iipeiko += 1;
                 if (hasAnyYakuKey(yakuKeys, ["chanta", "junchan", "混全帯么九", "純全帯么九"])) agariYakuCompositeCounts.chanta += 1;
-                if (hasAnyYakuKey(yakuKeys, ["ittsu", "ikkitsuukan", "一気通貫"])) agariYakuCompositeCounts.ittsu += 1;
+                if (hasAnyYakuKey(yakuKeys, ["ittsuu", "ittsu", "ikkitsuukan", "一気通貫"])) agariYakuCompositeCounts.ittsu += 1;
                 if (isYakumanAgariDetail(detailSource)) agariYakuCompositeCounts.yakuman += 1;
               }
 
