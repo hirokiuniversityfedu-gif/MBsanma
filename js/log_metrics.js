@@ -190,6 +190,7 @@
     if (value === "ryanmen") return true;
     if (value === "sanmenchan") return true;
     if (value === "multi_ryanmen") return true;
+    if (/^\d+menchan$/.test(value)) return true;
     if (value.includes("ryanmen")) return true;
     if (value.includes("two_sided")) return true;
     if (value.includes("two-sided")) return true;
