@@ -563,9 +563,26 @@ function getRyanmenCapableWaitCodesForLog(tiles13, fixedMeldCount, waitCodes){
   return out;
 }
 
+function getNMenchanKeyForWaitCountForLog(waitCount){
+  const count = Number(waitCount) || 0;
+  if (count <= 0) return "";
+  if (count === 4) return "4menchan";
+  if (count === 5) return "5menchan";
+  if (count === 6) return "6menchan";
+  if (count === 7) return "7menchan";
+  if (count === 8) return "8menchan";
+  if (count >= 9) return count + "menchan";
+  return "";
+}
+
 function classifyWaitTypeKeysForLog(tiles13, fixedMeldCount, waitCodes){
   const waits = Array.isArray(waitCodes) ? waitCodes.filter(Boolean) : [];
   if (!waits.length) return [];
+
+  if (waits.length >= 4){
+    const nMenchanKey = getNMenchanKeyForWaitCountForLog(waits.length);
+    return nMenchanKey ? [nMenchanKey] : ["other"];
+  }
 
   let ryanmenCount = 0;
   let hasOther = false;
@@ -628,7 +645,7 @@ function classifyWaitTypeKeysForLog(tiles13, fixedMeldCount, waitCodes){
 
 function isRyanmenWaitFromWaitCodesForLog(tiles13, fixedMeldCount, waitCodes, meldList){
   const keys = classifyWaitTypeKeysForLog(tiles13, fixedMeldCount, waitCodes);
-  return keys.includes("ryanmen") || keys.includes("sanmenchan") || keys.includes("multi_ryanmen");
+  return keys.includes("ryanmen") || keys.includes("sanmenchan") || keys.includes("multi_ryanmen") || keys.some((key)=> /^\d+menchan$/.test(String(key || "")));
 }
 
 function buildTenpaiDetailForPlayerRiichiLog(){
@@ -653,7 +670,7 @@ function buildTenpaiDetailForPlayerRiichiLog(){
   }
 
   const waitTypeKeys = classifyWaitTypeKeysForLog(tiles13, fixedMeldCount, waitCodes);
-  const isRyanmenWait = waitTypeKeys.includes("ryanmen") || waitTypeKeys.includes("sanmenchan") || waitTypeKeys.includes("multi_ryanmen");
+  const isRyanmenWait = waitTypeKeys.includes("ryanmen") || waitTypeKeys.includes("sanmenchan") || waitTypeKeys.includes("multi_ryanmen") || waitTypeKeys.some((key)=> /^\d+menchan$/.test(String(key || "")));
 
   return {
     waitTileCount,
