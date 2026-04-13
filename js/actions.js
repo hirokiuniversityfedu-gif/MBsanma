@@ -589,6 +589,8 @@ function classifyWaitTypeKeysForLog(tiles13, fixedMeldCount, waitCodes){
   }
 
   const out = [];
+  const isTankiOnlyMultiWait = !hasOther && ryanmenCount === 0 && gukeiKeys.size === 1 && gukeiKeys.has("tanki") && waits.length >= 2;
+
   if (ryanmenCount >= 2){
     if (!hasOther && gukeiKeys.size === 0 && ryanmenCount === waits.length){
       if (waits.length === 2){
@@ -601,10 +603,20 @@ function classifyWaitTypeKeysForLog(tiles13, fixedMeldCount, waitCodes){
     } else {
       out.push("multi_ryanmen");
     }
+  } else if (isTankiOnlyMultiWait){
+    if (waits.length === 2){
+      out.push("ryanmen");
+    } else if (waits.length === 3){
+      out.push("sanmenchan");
+    } else {
+      out.push("multi_ryanmen");
+    }
   }
 
   ["tanki", "shabo", "kanchan", "penchan"].forEach((key)=> {
-    if (gukeiKeys.has(key)) out.push(key);
+    if (gukeiKeys.has(key) && !(isTankiOnlyMultiWait && key === "tanki")){
+      out.push(key);
+    }
   });
 
   if (!out.length || hasOther){
