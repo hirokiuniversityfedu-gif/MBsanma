@@ -1,0 +1,1124 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ルール変更</title>
+  <style>
+    :root{
+      --bg-top:#103126;
+      --bg-bottom:#08120e;
+      --panel-bg:rgba(8,20,15,0.84);
+      --panel-border:rgba(255,255,255,0.12);
+      --text:#f6f7f3;
+      --muted:rgba(246,247,243,0.76);
+      --soft:rgba(246,247,243,0.10);
+      --soft-strong:rgba(246,247,243,0.16);
+      --gold-1:#f2d58f;
+      --gold-2:#d9bb72;
+      --gold-text:#1e1402;
+      --accent:#8fdcc1;
+      --danger:#e6a6a6;
+      --shadow:0 18px 50px rgba(0,0,0,0.28);
+      --radius-xl:28px;
+      --radius-lg:18px;
+      --radius-md:14px;
+      --radius-sm:12px;
+      --content-w:1120px;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    html,body{
+      margin:0;
+      min-height:100%;
+    }
+
+    body{
+      min-height:100vh;
+      background:linear-gradient(180deg,var(--bg-top) 0%,var(--bg-bottom) 100%);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      padding:24px;
+    }
+
+    .page{
+      width:min(100%,var(--content-w));
+      margin:0 auto;
+      display:grid;
+      gap:18px;
+    }
+
+    .hero{
+      display:grid;
+      gap:16px;
+      padding:24px;
+      border-radius:var(--radius-xl);
+      background:var(--panel-bg);
+      border:1px solid var(--panel-border);
+      box-shadow:var(--shadow);
+    }
+
+    .heroTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .heroTitle{
+      display:grid;
+      gap:10px;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      width:max-content;
+      min-height:28px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(143,220,193,0.14);
+      border:1px solid rgba(143,220,193,0.22);
+      color:var(--accent);
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:0.04em;
+    }
+
+    h1{
+      margin:0;
+      font-size:34px;
+      line-height:1.15;
+    }
+
+    .heroText{
+      margin:0;
+      max-width:760px;
+      color:var(--muted);
+      line-height:1.8;
+      font-size:15px;
+    }
+
+    .heroActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:48px;
+      padding:0 18px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:800;
+      font-size:14px;
+      border:1px solid transparent;
+      transition:transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      cursor:pointer;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .btnPrimary{
+      background:linear-gradient(180deg,var(--gold-1) 0%,var(--gold-2) 100%);
+      color:var(--gold-text);
+    }
+
+    .btnGhost{
+      background:rgba(255,255,255,0.04);
+      color:var(--text);
+      border-color:rgba(255,255,255,0.10);
+    }
+
+    .summaryGrid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .summaryCard{
+      display:grid;
+      gap:8px;
+      padding:16px 18px;
+      border-radius:var(--radius-lg);
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      min-height:108px;
+    }
+
+    .summaryLabel{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .summaryValue{
+      font-size:19px;
+      font-weight:800;
+      line-height:1.4;
+    }
+
+    .summaryNote{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .tabsWrap{
+      display:grid;
+      gap:14px;
+      padding:16px;
+      border-radius:var(--radius-xl);
+      background:var(--panel-bg);
+      border:1px solid var(--panel-border);
+      box-shadow:var(--shadow);
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .tabBtn{
+      appearance:none;
+      border:none;
+      background:rgba(255,255,255,0.05);
+      color:var(--text);
+      min-height:46px;
+      padding:0 16px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:14px;
+      letter-spacing:0.01em;
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,0.08);
+      transition:background 0.15s ease,border-color 0.15s ease,transform 0.15s ease;
+    }
+
+    .tabBtn:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,0.08);
+    }
+
+    .tabBtn[aria-selected="true"]{
+      background:linear-gradient(180deg,var(--gold-1) 0%,var(--gold-2) 100%);
+      color:var(--gold-text);
+      border-color:transparent;
+    }
+
+    .tabPanels{
+      display:grid;
+    }
+
+    .tabPanel{
+      display:none;
+      gap:16px;
+    }
+
+    .tabPanel.isActive{
+      display:grid;
+    }
+
+    .sectionCard{
+      display:grid;
+      gap:14px;
+      padding:20px;
+      border-radius:22px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .sectionHead{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    .sectionTitleBox{
+      display:grid;
+      gap:6px;
+    }
+
+    .sectionTitle{
+      margin:0;
+      font-size:22px;
+      line-height:1.3;
+    }
+
+    .sectionLead{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.7;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:30px;
+      padding:0 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:0.02em;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.06);
+      color:var(--text);
+      white-space:nowrap;
+    }
+
+    .badgeAccent{
+      color:var(--accent);
+      background:rgba(143,220,193,0.12);
+      border-color:rgba(143,220,193,0.18);
+    }
+
+    .badgeMuted{
+      color:var(--muted);
+    }
+
+    .ruleGrid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .ruleItem{
+      display:grid;
+      gap:8px;
+      padding:16px;
+      border-radius:16px;
+      background:rgba(0,0,0,0.16);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .ruleLabel{
+      font-size:13px;
+      font-weight:700;
+      color:var(--muted);
+      letter-spacing:0.01em;
+    }
+
+    .ruleValue{
+      font-size:17px;
+      font-weight:800;
+      line-height:1.45;
+    }
+
+    .ruleSub{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.65;
+    }
+
+    .toggleList{
+      display:grid;
+      gap:10px;
+    }
+
+    .toggleRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:14px 16px;
+      border-radius:16px;
+      background:rgba(0,0,0,0.16);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .toggleText{
+      display:grid;
+      gap:4px;
+      min-width:0;
+    }
+
+    .toggleTitle{
+      font-size:15px;
+      font-weight:800;
+      line-height:1.4;
+    }
+
+    .toggleDesc{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .switch{
+      position:relative;
+      width:56px;
+      height:32px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.12);
+      border:1px solid rgba(255,255,255,0.10);
+      flex:0 0 auto;
+    }
+
+    .switch::after{
+      content:"";
+      position:absolute;
+      top:3px;
+      left:3px;
+      width:24px;
+      height:24px;
+      border-radius:50%;
+      background:#ffffff;
+      box-shadow:0 4px 10px rgba(0,0,0,0.24);
+    }
+
+    .switch.isOn{
+      background:rgba(242,213,143,0.28);
+      border-color:rgba(242,213,143,0.24);
+    }
+
+    .switch.isOn::after{
+      left:27px;
+      background:linear-gradient(180deg,var(--gold-1) 0%,var(--gold-2) 100%);
+    }
+
+    .yakuColumns{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .yakuGroup{
+      display:grid;
+      gap:10px;
+      padding:16px;
+      border-radius:16px;
+      background:rgba(0,0,0,0.16);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .yakuGroupTitle{
+      margin:0;
+      font-size:16px;
+      font-weight:800;
+    }
+
+    .tagList{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      min-height:34px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.08);
+      font-size:13px;
+      font-weight:700;
+      color:var(--text);
+    }
+
+    .footerNote{
+      padding:16px 18px;
+      border-radius:18px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      color:var(--muted);
+      line-height:1.8;
+      font-size:13px;
+    }
+
+    @media (max-width: 900px){
+      .summaryGrid,
+      .ruleGrid,
+      .yakuColumns{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 640px){
+      body{
+        padding:14px;
+      }
+
+      .hero,
+      .tabsWrap{
+        padding:16px;
+      }
+
+      h1{
+        font-size:28px;
+      }
+
+      .sectionCard{
+        padding:16px;
+      }
+
+      .tabBtn{
+        width:100%;
+        justify-content:center;
+      }
+
+      .toggleRow{
+        align-items:flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="heroTop">
+        <div class="heroTitle">
+          <span class="eyebrow">SANMA LAB</span>
+          <h1>ルール変更</h1>
+          <p class="heroText">
+            ルール内容をタブごとにまとめて確認できるページです。
+            点数や使用牌、基本ルール、採用役まで、項目別に見やすく整理しています。
+          </p>
+        </div>
+
+        <div class="heroActions">
+          <a class="btn btnPrimary" href="index_app.html">トップへ戻る</a>
+          <button class="btn btnGhost" type="button" id="scrollActiveTabBtn">今のタブ先頭へ</button>
+        </div>
+      </div>
+
+      <div class="summaryGrid">
+        <div class="summaryCard">
+          <div class="summaryLabel">ページ案内</div>
+          <div class="summaryValue">ルールをカテゴリ別に確認</div>
+          <div class="summaryNote">全体像を見ながら、気になる項目をタブごとに確認できます。</div>
+        </div>
+
+        <div class="summaryCard">
+          <div class="summaryLabel">タブ構成</div>
+          <div class="summaryValue">6つのカテゴリに整理</div>
+          <div class="summaryNote">概要 / 点数・精算 / 使用牌 / 基本 / 補足 / 採用役 に分けています。</div>
+        </div>
+
+        <div class="summaryCard">
+          <div class="summaryLabel">確認できる内容</div>
+          <div class="summaryValue">ルールの見どころを一覧化</div>
+          <div class="summaryNote">点数条件から役の採用内容まで、ひと目で確認しやすい構成です。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tabsWrap">
+      <div class="tabs" role="tablist" aria-label="ルール変更タブ">
+        <button class="tabBtn" type="button" role="tab" aria-selected="true" aria-controls="panel-overview" id="tab-overview" data-tab="overview">概要</button>
+        <button class="tabBtn" type="button" role="tab" aria-selected="false" aria-controls="panel-score" id="tab-score" data-tab="score">点数・精算</button>
+        <button class="tabBtn" type="button" role="tab" aria-selected="false" aria-controls="panel-tiles" id="tab-tiles" data-tab="tiles">使用牌</button>
+        <button class="tabBtn" type="button" role="tab" aria-selected="false" aria-controls="panel-basic" id="tab-basic" data-tab="basic">基本</button>
+        <button class="tabBtn" type="button" role="tab" aria-selected="false" aria-controls="panel-extra" id="tab-extra" data-tab="extra">補足</button>
+        <button class="tabBtn" type="button" role="tab" aria-selected="false" aria-controls="panel-yaku" id="tab-yaku" data-tab="yaku">採用役</button>
+      </div>
+
+      <div class="tabPanels">
+        <section class="tabPanel isActive" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+          <article class="sectionCard">
+            <div class="sectionHead">
+              <div class="sectionTitleBox">
+                <h2 class="sectionTitle">ルールセットの全体像</h2>
+                <p class="sectionLead">この卓がどんなルールで進むかを、最初にまとめて確認できるエリアです。</p>
+              </div>
+              <span class="badge badgeAccent">概要</span>
+            </div>
+
+            <div class="ruleGrid">
+              <div class="ruleItem">
+                <div class="ruleLabel">対局形式</div>
+                <div class="ruleValue">三人麻雀</div>
+                <div class="ruleSub">プレイ形式の基本情報を表示します。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">ルールセット名</div>
+                <div class="ruleValue">SANMA LAB 標準ルール</div>
+                <div class="ruleSub">現在選択中のルール名を表示する想定です。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">対象カテゴリ</div>
+                <div class="ruleValue">点数 / 使用牌 / 役 / 補足</div>
+                <div class="ruleSub">どんな内容がこのページに含まれているかをまとめています。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">確認範囲</div>
+                <div class="ruleValue">対局全体の基本条件</div>
+                <div class="ruleSub">進行や精算、採用役までカテゴリ別に確認できます。</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="sectionCard">
+            <div class="sectionHead">
+              <div class="sectionTitleBox">
+                <h2 class="sectionTitle">このページで確認できること</h2>
+                <p class="sectionLead">まず知っておきたい要点を、見やすくまとめています。</p>
+              </div>
+              <span class="badge badgeMuted">案内</span>
+            </div>
+
+            <div class="toggleList">
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">ルール内容をカテゴリ別に確認</div>
+                  <div class="toggleDesc">知りたい項目をタブから選んで、順番に確認できます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">点数条件や精算条件を一覧で確認</div>
+                  <div class="toggleDesc">配給原点や本場、供託などの条件をまとめて見られます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">採用役や特殊条件も確認可能</div>
+                  <div class="toggleDesc">採用される役や補足ルールも、タブごとに確認できます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="tabPanel" id="panel-score" role="tabpanel" aria-labelledby="tab-score">
+          <article class="sectionCard">
+            <div class="sectionHead">
+              <div class="sectionTitleBox">
+                <h2 class="sectionTitle">点数・精算</h2>
+                <p class="sectionLead">持ち点や返し、本場、供託、テンパイ料など、精算まわりの条件をまとめています。</p>
+              </div>
+              <span class="badge">精算条件</span>
+            </div>
+
+            <div class="ruleGrid">
+              <div class="ruleItem">
+                <div class="ruleLabel">配給原点</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">ゲーム開始時の持ち点に関する項目です。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">原点 / 返し</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">最終的な精算基準に関わる項目です。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">オカ</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">最終順位の精算に関わる条件です。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">ウマ</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">順位ごとの精算差を決める項目です。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">本場</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">連荘時の加算条件を確認できます。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">供託</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">リーチ棒や持ち越し条件に関する項目です。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">テンパイ料</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">流局時の支払い条件を確認できます。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">飛び / 箱下</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">飛び終了や箱下計算の有無に関する項目です。</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="sectionCard">
+            <div class="sectionHead">
+              <div class="sectionTitleBox">
+                <h2 class="sectionTitle">点数まわりの確認ポイント</h2>
+                <p class="sectionLead">ゲームの結果に関わる代表的な条件をまとめています。</p>
+              </div>
+              <span class="badge badgeMuted">確認項目</span>
+            </div>
+
+            <div class="toggleList">
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">最終スコア条件</div>
+                  <div class="toggleDesc">オカやウマなど、最終精算に関わる条件を確認できます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">本場と供託の扱い</div>
+                  <div class="toggleDesc">連荘時やリーチ時の加算条件をまとめて見られます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">流局時の精算条件</div>
+                  <div class="toggleDesc">テンパイ料や飛び終了の有無もここで確認できます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="tabPanel" id="panel-tiles" role="tabpanel" aria-labelledby="tab-tiles">
+          <article class="sectionCard">
+            <div class="sectionHead">
+              <div class="sectionTitleBox">
+                <h2 class="sectionTitle">使用牌</h2>
+                <p class="sectionLead">牌構成や赤牌、北や花牌の扱いなど、使用する牌に関する条件をまとめています。</p>
+              </div>
+              <span class="badge">牌構成</span>
+            </div>
+
+            <div class="ruleGrid">
+              <div class="ruleItem">
+                <div class="ruleLabel">牌種構成</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">使用する牌の種類や構成を確認できます。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">赤牌</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">赤牌の有無や枚数に関する項目です。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">北の扱い</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">北をどのように扱うかを確認できます。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">花牌の扱い</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">花牌を使用する場合の条件を確認できます。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">山枚数</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">牌構成に応じた山の条件を表示します。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">王牌 / ドラ表示牌</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">ドラまわりの基本条件を確認できます。</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="sectionCard">
+            <div class="sectionHead">
+              <div class="sectionTitleBox">
+                <h2 class="sectionTitle">使用牌の見どころ</h2>
+                <p class="sectionLead">このタブでは、打点や進行に影響しやすい牌条件を確認できます。</p>
+              </div>
+              <span class="badge badgeAccent">注目項目</span>
+            </div>
+
+            <div class="toggleList">
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">抜きドラの扱い</div>
+                  <div class="toggleDesc">北や花牌の採用内容によって、進行や打点条件が変わります。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">赤牌とドラ条件</div>
+                  <div class="toggleDesc">赤牌の枚数やドラ条件をまとめて確認できます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">山と王牌の構成</div>
+                  <div class="toggleDesc">ゲーム開始時の牌構成条件を確認できます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="tabPanel" id="panel-basic" role="tabpanel" aria-labelledby="tab-basic">
+          <article class="sectionCard">
+            <div class="sectionHead">
+              <div class="sectionTitleBox">
+                <h2 class="sectionTitle">基本ルール</h2>
+                <p class="sectionLead">喰いタン、後付け、一発、ダブル立直、ツモ損、連荘条件などをまとめています。</p>
+              </div>
+              <span class="badge">基本条件</span>
+            </div>
+
+            <div class="toggleList">
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">喰いタン</div>
+                  <div class="toggleDesc">喰いタンの採用有無を表示する項目です。</div>
+                </div>
+                <div class="switch" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">後付け</div>
+                  <div class="toggleDesc">後付けの可否を表示する項目です。</div>
+                </div>
+                <div class="switch" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">一発</div>
+                  <div class="toggleDesc">一発の採用有無を表示する項目です。</div>
+                </div>
+                <div class="switch" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">ダブル立直</div>
+                  <div class="toggleDesc">ダブル立直の採用内容を確認できます。</div>
+                </div>
+                <div class="switch" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">ツモ損</div>
+                  <div class="toggleDesc">ツモ損の有無を表示する項目です。</div>
+                </div>
+                <div class="switch" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">連荘条件</div>
+                  <div class="toggleDesc">親の連荘条件に関する内容を確認できます。</div>
+                </div>
+                <div class="switch" aria-hidden="true"></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="sectionCard">
+            <div class="sectionHead">
+              <div class="sectionTitleBox">
+                <h2 class="sectionTitle">進行に関わる項目</h2>
+                <p class="sectionLead">局数や途中流局など、対局の流れに関わる内容をまとめています。</p>
+              </div>
+              <span class="badge badgeMuted">進行条件</span>
+            </div>
+
+            <div class="ruleGrid">
+              <div class="ruleItem">
+                <div class="ruleLabel">局数</div>
+                <div class="ruleValue">東風 / 半荘</div>
+                <div class="ruleSub">どの形式で進行するかを表示します。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">途中流局</div>
+                <div class="ruleValue">九種九牌 / 四風連打 ほか</div>
+                <div class="ruleSub">採用される途中流局の内容を確認できます。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">リーチ後行動制限</div>
+                <div class="ruleValue">暗槓 / 北抜き など</div>
+                <div class="ruleSub">リーチ後に可能な行動条件を表示します。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">ドラまわり</div>
+                <div class="ruleValue">裏ドラ / 槓ドラ / 槓裏</div>
+                <div class="ruleSub">ドラ関連の採用内容を確認できます。</div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="tabPanel" id="panel-extra" role="tabpanel" aria-labelledby="tab-extra">
+          <article class="sectionCard">
+            <div class="sectionHead">
+              <div class="sectionTitleBox">
+                <h2 class="sectionTitle">補足ルール</h2>
+                <p class="sectionLead">細かな精算条件や特殊な取り決めなど、補足的なルールをまとめています。</p>
+              </div>
+              <span class="badge">補足条件</span>
+            </div>
+
+            <div class="ruleGrid">
+              <div class="ruleItem">
+                <div class="ruleLabel">切り上げ満貫</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">切り上げ満貫の採用有無を確認できます。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">符計算例外</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">七対子や平和ツモなどの符条件を表示します。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">流し満貫 / 流し倍満</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">特殊流局時の条件を確認できます。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">役満の複合</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">役満の重なり方や扱いを表示する項目です。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">祝儀 / チップ</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">祝儀やチップの条件を確認できます。</div>
+              </div>
+
+              <div class="ruleItem">
+                <div class="ruleLabel">店ルール特有項目</div>
+                <div class="ruleValue">未設定</div>
+                <div class="ruleSub">個別ルールがある場合に表示するための枠です。</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="sectionCard">
+            <div class="sectionHead">
+              <div class="sectionTitleBox">
+                <h2 class="sectionTitle">補足ルールの見どころ</h2>
+                <p class="sectionLead">通常ルールに加えて、細かな条件まで確認したいときに見るタブです。</p>
+              </div>
+              <span class="badge badgeMuted">追加条件</span>
+            </div>
+
+            <div class="toggleList">
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">特殊流局時の条件</div>
+                  <div class="toggleDesc">流し満貫など、通常とは別扱いの精算条件を確認できます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">祝儀やチップ条件</div>
+                  <div class="toggleDesc">点数以外の加点・精算条件もまとめて見られます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">個別ルールの確認</div>
+                  <div class="toggleDesc">標準ルール以外の補足条件がある場合に確認できます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="tabPanel" id="panel-yaku" role="tabpanel" aria-labelledby="tab-yaku">
+          <article class="sectionCard">
+            <div class="sectionHead">
+              <div class="sectionTitleBox">
+                <h2 class="sectionTitle">採用役</h2>
+                <p class="sectionLead">採用される役を一覧で確認できるタブです。役の全体像をまとめて見られます。</p>
+              </div>
+              <span class="badge">役一覧</span>
+            </div>
+
+            <div class="yakuColumns">
+              <section class="yakuGroup">
+                <h3 class="yakuGroupTitle">基本役</h3>
+                <div class="tagList">
+                  <span class="tag">立直</span>
+                  <span class="tag">門前清自摸和</span>
+                  <span class="tag">断么九</span>
+                  <span class="tag">平和</span>
+                  <span class="tag">一盃口</span>
+                  <span class="tag">役牌</span>
+                  <span class="tag">海底撈月</span>
+                  <span class="tag">河底撈魚</span>
+                  <span class="tag">嶺上開花</span>
+                  <span class="tag">槍槓</span>
+                </div>
+              </section>
+
+              <section class="yakuGroup">
+                <h3 class="yakuGroupTitle">中打点役</h3>
+                <div class="tagList">
+                  <span class="tag">三色同順</span>
+                  <span class="tag">一気通貫</span>
+                  <span class="tag">対々和</span>
+                  <span class="tag">三暗刻</span>
+                  <span class="tag">三槓子</span>
+                  <span class="tag">混全帯么九</span>
+                  <span class="tag">純全帯么九</span>
+                  <span class="tag">混一色</span>
+                  <span class="tag">清一色</span>
+                  <span class="tag">小三元</span>
+                </div>
+              </section>
+
+              <section class="yakuGroup">
+                <h3 class="yakuGroupTitle">三麻で注目したい項目</h3>
+                <div class="tagList">
+                  <span class="tag">北抜き関連</span>
+                  <span class="tag">赤ドラ</span>
+                  <span class="tag">表ドラ</span>
+                  <span class="tag">裏ドラ</span>
+                  <span class="tag">槓ドラ</span>
+                  <span class="tag">一発</span>
+                  <span class="tag">ダブル立直</span>
+                  <span class="tag">流し満貫系</span>
+                </div>
+              </section>
+
+              <section class="yakuGroup">
+                <h3 class="yakuGroupTitle">役満</h3>
+                <div class="tagList">
+                  <span class="tag">国士無双</span>
+                  <span class="tag">四暗刻</span>
+                  <span class="tag">大三元</span>
+                  <span class="tag">字一色</span>
+                  <span class="tag">小四喜</span>
+                  <span class="tag">大四喜</span>
+                  <span class="tag">清老頭</span>
+                  <span class="tag">四槓子</span>
+                  <span class="tag">緑一色</span>
+                  <span class="tag">天和 / 地和</span>
+                </div>
+              </section>
+            </div>
+          </article>
+
+          <article class="sectionCard">
+            <div class="sectionHead">
+              <div class="sectionTitleBox">
+                <h2 class="sectionTitle">採用役の確認ポイント</h2>
+                <p class="sectionLead">どの役が採用されるか、カテゴリごとに見やすく整理しています。</p>
+              </div>
+              <span class="badge badgeAccent">役確認</span>
+            </div>
+
+            <div class="toggleList">
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">基本役を一覧で確認</div>
+                  <div class="toggleDesc">立直や断么九など、基本的な役をまとめています。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">三麻特有の加点要素も掲載</div>
+                  <div class="toggleDesc">北抜きや赤ドラなど、三麻らしい要素も確認できます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleText">
+                  <div class="toggleTitle">役満までまとめて確認</div>
+                  <div class="toggleDesc">役満の採用内容も同じページ内で確認できます。</div>
+                </div>
+                <div class="switch isOn" aria-hidden="true"></div>
+              </div>
+            </div>
+          </article>
+        </section>
+      </div>
+
+      <div class="footerNote">
+        ルール内容は、各タブからカテゴリ別に確認できます。
+        気になる項目がある場合は、該当タブを開いて内容をご確認ください。
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var tabButtons = Array.prototype.slice.call(document.querySelectorAll(".tabBtn"));
+      var tabPanels = Array.prototype.slice.call(document.querySelectorAll(".tabPanel"));
+      var scrollActiveTabBtn = document.getElementById("scrollActiveTabBtn");
+
+      function activateTab(tabName) {
+        tabButtons.forEach(function (button) {
+          var isActive = button.dataset.tab === tabName;
+          button.setAttribute("aria-selected", isActive ? "true" : "false");
+        });
+
+        tabPanels.forEach(function (panel) {
+          var isActive = panel.id === "panel-" + tabName;
+          panel.classList.toggle("isActive", isActive);
+        });
+      }
+
+      tabButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          activateTab(button.dataset.tab);
+        });
+      });
+
+      scrollActiveTabBtn.addEventListener("click", function () {
+        var activePanel = document.querySelector(".tabPanel.isActive");
+        if (!activePanel) return;
+        activePanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    })();
+  </script>
+</body>
+</html>
